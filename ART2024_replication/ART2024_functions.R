@@ -1,5 +1,5 @@
 ## Replication code for "Bayesian Regression Discontinuity Design with Unknown Cutoff" ##
-## ART Application - functions to run the main script ##
+## ART Application - functions to run ART2024_main.R and ART2024_cont.R ##
 ## Julia Kowalska, Mark van de Wiel, Stéphanie van der Pas ##
 
 ## Bayesian models ##

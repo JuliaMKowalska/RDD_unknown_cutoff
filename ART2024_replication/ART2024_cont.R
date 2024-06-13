@@ -103,7 +103,7 @@ system.time(HIV_FULL_treatment<- run.jags('treatment_CONT.txt', data=datHIV_T,mo
 # Convergence check
 plot(HIV_FULL_treatment,c('trace'))
 
-# Fitting full LoTTA model (approx 13.5 hours)
+# Fitting full LoTTA model 
 init1=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,100)
 init2=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,200)
 init3=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,300)
@@ -178,7 +178,7 @@ param_c=c('c')
 datHIV_cTr<- run.jags('cutoff_initial_CONT.txt',inits = list(initcART) ,data=datHIV_T,monitor=param_c,burnin = 1000,sample=2000,adapt = 100,n.chains = 1,method = 'simple')
 C_startTr=as.numeric(combine.mcmc(datHIV_cTr))
 
-# Fitting full LoTTA model (approx 5.5 hours)
+# Fitting full LoTTA model (approx 1.5 hours)
 init1=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,100)
 init2=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,200)
 init3=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,300)
@@ -198,6 +198,7 @@ C_Full=as.numeric(Samples_FULL[,1])*nc
 C_Full_DIS=ceiling(C_Full)
 C_Trimmed=as.numeric(Samples_TRIM[,1])*nc
 C_Trimmed_DIS=ceiling(C_Trimmed)
+
 c_Full=data.frame(C=C_Full_DIS)  
 c_Full$Dataset<-'Full'
 
