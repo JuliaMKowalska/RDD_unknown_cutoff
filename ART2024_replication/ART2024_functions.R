@@ -1,16 +1,15 @@
 ## Replication code for "Bayesian Regression Discontinuity Design with Unknown Cutoff" ##
-## ART Application - functions ##
+## ART Application - functions to run the main script ##
 ## Julia Kowalska, Mark van de Wiel, Stéphanie van der Pas ##
 
 ## Bayesian models ##
 
-# Model for the initial cutoff localization for a binary score
+# Model for the initial cutoff localization for a discrete score
 #--This model fits two constant functions to the treatment data. The resulting 
 # posterior samples of the cutoff c are then used to initialize LoTTA treatment model and 
 # full LoTTA model.
 # t - treatment data, c - cutoff, al - constant value on the left side of the cutoff, j - jump size at the cutoff
 # prob - vector of length n of prior weights on the discrete location of c,
-# lb - grid size
 # ct - categorical variable, with discrete distribution accoridng to prob on 1,...,n
 # start, nc - shifting and rescaling coefficient to translate prior on ct to the domain of c--#
 cat("model
@@ -29,11 +28,11 @@ cat("model
     ct~dcat(prob)
     
     
-    }", file="cutoff_initial_dis.txt") 
+    }", file="cutoff_initial_DIS.txt") 
 
-# Treatment model for a binary score
+# Treatment model for a discrete score
 #--This model fits to the treatment data two connected linear functions on each side of the cutoff. 
-# It is the first stage of the LoTTA.--#
+# It is the first stage of LoTTA.--#
 # t - treatment data, c - cutoff, j - jump size at the cutoff
 # a - slope, b - intercept, l/r - segment on the left/right-hand side, 1/2 - segment close/far from the cutoff 
 # k1t - length of the window on the left-hand side, k2t - length of the window on the right-hand side
@@ -73,7 +72,7 @@ cat("model
     b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
     
     
-    }", file="treatment_BIN.txt") 
+    }", file="treatment_DIS.txt") 
 # LoTTA model for a binary score
 #--This model fits jointly treatment and outcome functions.--# 
 # t - treatment data, y - outcome data, c - cutoff, j - jump size at the cutoff
@@ -145,7 +144,7 @@ cat("model
     eff=(a0r-a0l)/j
     
     
-    }", file="LoTTA_BIN.txt")
+    }", file="LoTTA_DIS_BIN.txt")
 
 # Function to compute minimum and maximum window size 
 # X - score 
@@ -168,7 +167,7 @@ bounds<-function(X,ns=25){
   lb=qd[[1]]
   return(list(ubl=ubl,ubr=ubr,lb=lb))
 }
-# Function to sample initial values of a chain
+# Function to sample an initial value of a chain
 # Treatment model
 # X - score 
 # T - treatment data
@@ -179,7 +178,7 @@ bounds<-function(X,ns=25){
 # than for the model fitting (ns=25)
 # s - seed 
 
-Initial_BINARY_treatment<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
+Initial_DIS_treatment<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
   set.seed(s)
   pr=0.5
   MIN=min(X)
@@ -214,7 +213,7 @@ Initial_BINARY_treatment<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0
 # for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
 # than for the model fitting (ns=25)
 # s - seed 
-Initial_BINARY<-function(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
+Initial_DIS_BIN<-function(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
   set.seed(s)
   pr=0.5
   MIN=min(X)
@@ -349,4 +348,232 @@ treatment_function_sample<-function(coef_s,x,nc){
   paramt<- ifelse(x<c,ifelse(x>=c-k1t,a1lt*x+b1lt,a2lt*x+b2lt),ifelse(x<=c+k2t,a1rt*x+b1rt,a2rt*x+b2rt)) 
   
   return(paramt)
+}
+
+## Functions for ART2024_cont.R ##
+# Model for the initial cutoff localization for a continuous score
+#--This model fits two constant functions to the treatment data. The resulting 
+# posterior samples of the cutoff c are then used to initialize LoTTA treatment model and 
+# full LoTTA model.
+# t - treatment data, c - cutoff, al - constant value on the left side of the cutoff, j - jump size at the cutoff
+# clb - lower bound of the interval in the prior of c ~ unif(clb,cub),
+# cub - upper bound of the interval in the prior of c ~ unif(clb,cub) #
+cat("model
+    {
+  
+    for ( i in 1:N ) {
+      
+      t[i]~dbern(paramt[i])
+      paramt[i] <- ifelse(x[i]<c,al,al+j) 
+    }
+    
+    
+    al~dunif(0,1-j)
+    j~dunif(jlb,1)
+    c~dunif(clb,cub)
+    
+    
+    }", file="cutoff_initial_CONT.txt") 
+
+# Treatment model for a continuous score
+#--This model fits to the treatment data two connected linear functions on each side of the cutoff. 
+# It is the first stage of LoTTA.--#
+# t - treatment data, c - cutoff, j - jump size at the cutoff
+# a - slope, b - intercept, l/r - segment on the left/right-hand side, 1/2 - segment close/far from the cutoff 
+# clb - lower bound of the interval in the prior of c ~ unif(clb,cub),
+# cub - upper bound of the interval in the prior of c ~ unif(clb,cub),
+# k1t - length of the window on the left-hand side, k2t - length of the window on the right-hand side
+# lb - minimum window size
+# ublt - minimum value of the left boundary point, ubrt - maximum value of the right boundary point
+# jlb - lower bound of the jump size in the treatment probability #
+cat("model
+    {
+  
+    for ( i in 1:N ) {
+      
+      t[i]~dbern(paramt[i])
+      paramt[i] <- ifelse(x[i]<c,ifelse(x[i]>=c-k1t,a1lt*x[i]+b1lt,a2lt*x[i]+b2lt),ifelse(x[i]<=c+k2t,a1rt*x[i]+b1rt,a2rt*x[i]+b2rt)) 
+    }
+    pr=0.0001
+    MAX=max(x)
+    MIN=min(x)
+    
+    
+    ### Define the priors
+    
+    c~dunif(clb,cub)
+    xc=x-c
+    j~dunif(jlb,1)
+    k1t~dunif(lb,c-ublt)
+    k2t~dunif(lb,ubrt-c)
+    a2lt~dunif(0,(1-j)/(c-k1t-MIN))
+    b2lt~dunif(-a2lt*MIN,1-j-a2lt*(c-k1t))
+    a1lt~dunif(0,(1-j-a2lt*(c-k1t)-b2lt)/k1t)
+    b1lt=(c-k1t)*(a2lt-a1lt)+b2lt
+    a1rt~dunif(0,(1-a1lt*c-b1lt-j)/k2t)
+    b1rt=a1lt*c+b1lt+j-a1rt*c
+    a2rt~dunif(0,(1-b1rt-(c+k2t)*a1rt)/(MAX-c-k2t))
+    b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
+    
+    
+    }", file="treatment_CONT.txt") 
+
+# LoTTA model for a continuous score and binary outcomes
+#--This model fits jointly treatment and outcome functions.--# 
+# t - treatment data, y - outcome data, c - cutoff, j - jump size at the cutoff
+# clb - lower bound of the interval in the prior of c ~ unif(clb,cub),
+# cub - upper bound of the interval in the prior of c ~ unif(clb,cub),
+# start, nc - shifting and rescaling coefficient to translate prior on ct to the domain of c--#
+# lb - grid size
+# eff - treatment effect for compliers
+
+# In the treatment model:
+# a - slope, b - intercept, l/r - segment on the left/right-hand side, 1/2 - segment close/far from the cutoff 
+# k1t - length of the window on the left-hand side, k2t - length of the window on the right-hand side
+# jlb - lower bound of the jump size in the treatment probability
+
+# In the outcome model:
+# ail - coefficient of x^i on the left-hand side, air - coefficient of x^i on the right-hand side,
+# b0l(r), b1l(r) - coefficients of the linear part in the logit function on the left(right)-hand side
+# calculated so that a0l(r)+a1l(r)*(x-c) is the first order approximation of the function in the tail
+# on the left(right) side 
+# kl(r) - boundary point of the window on the left(right) side of the cutoff
+# ubl - minimum value of the left boundary point, ubr - maximum value of the right boundary point
+# pr - precision in priors of the coefficients # 
+
+cat("model
+    {
+  
+    for ( i in 1:N ) {
+      y[i]~dbern(param[i])
+      t[i]~dbern(paramt[i])
+      param[i] <-ifelse(x[i]<c,a1l*(xc[i])+a0l+ilogit(100*(kl-x[i]))*(ilogit((a3l)*(xc[i])^3+(a2l)*(xc[i])^2+b1l*(xc[i])+b0l)-a0l-a1l*xc[i]),a1r*(xc[i])+a0r+ilogit(100*(x[i]-kr))*(ilogit((a3r)*(xc[i])^3+(a2r)*(xc[i])^2+b1r*(xc[i])+b0r)-a0r-a1r*xc[i]))
+      paramt[i] <- ifelse(x[i]<c,ifelse(x[i]>=c-k1t,a1lt*x[i]+b1lt,a2lt*x[i]+b2lt),ifelse(x[i]<=c+k2t,a1rt*x[i]+b1rt,a2rt*x[i]+b2rt)) 
+
+    }
+    pr=0.00001
+    MAX=max(x)
+    MIN=min(x)
+    c~dunif(clb,cub)
+    xc=x-c
+    j~dunif(max(jlb,abs(a0r-a0l)),1)
+    k1t~dunif(lb,c-ublt)
+    k2t~dunif(lb,ubrt-c)
+    a2lt~dunif(0,(1-j)/(c-k1t-MIN))
+    b2lt~dunif(-a2lt*MIN,1-j-a2lt*(c-k1t))
+    a1lt~dunif(0,(1-j-a2lt*(c-k1t)-b2lt)/k1t)
+    b1lt=(c-k1t)*(a2lt-a1lt)+b2lt
+    a1rt~dunif(0,(1-a1lt*c-b1lt-j)/k2t)
+    b1rt=a1lt*c+b1lt+j-a1rt*c
+    a2rt~dunif(0,(1-b1rt-(c+k2t)*a1rt)/(MAX-c-k2t))
+    b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
+    
+    kl~dunif(ubl,c-lb)
+    kld=kl-c
+    a0l~dunif(0,1)
+    b0l=logit(a0l)
+    a1l~dunif((0.99-a0l)/(kld),(0.01-a0l)/(kld))
+    b1l=a1l*pow(ilogit(-b0l)*(1-ilogit(-b0l)),-1)
+    a2l~dnorm(0,-pr*kld)
+    a3l~dnorm(0,-pr*kld)
+    
+    kr~dunif(c+lb,ubr)
+    krd=kr-c
+    a0r~dunif(0,1)
+    b0r=logit(a0r)
+    a1r~dunif((0.01-a0r)/(krd),(0.99-a0r)/(krd))
+    b1r=a1r*pow(ilogit(-b0r)*(1-ilogit(-b0r)),-1)
+    a2r~dnorm(0,pr*krd)
+    a3r~dnorm(0,pr*krd)
+    eff=(a0r-a0l)/j
+    
+    
+    }", file="LoTTA_CONT_BIN.txt")
+
+# Functions to sample an initial value of a chain
+# Treatment model - continous score
+# X - score 
+# T - treatment data
+# C_start - posterior samples of cutoff location on a continous scale
+# obtained through "cutoff_initial_CONT.txt"
+# ubl - minimum value of the window's left boundary point, ubr - maximum value of the window's right boundary point
+# for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
+# than for the model fitting (ns=25)
+# s - seed 
+
+Initial_CONT_treatment<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
+  set.seed(s)
+  pr=0.5
+  MIN=min(X)
+  MAX=max(X)
+  c=sample(C_start,1)
+  tl=mean(T[X<c])
+  tr=mean(T[X>=c])
+  
+  
+  j=max(jlb,tr-tl)
+  k1t=runif(1,lb,c-ubl)
+  k2t=runif(1,lb,ubr-c)
+  a2lt=0
+  b2lt=tl
+  a1lt=0
+  b1lt=(c-k1t)*(a2lt-a1lt)+b2lt
+  a1rt=0
+  b1rt=a1lt*c+b1lt+j-a1rt*c
+  a2rt=0
+  b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
+  return(list(c=c,j=j,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
+}
+
+# LoTTA model
+# X - score 
+# T - treatment data
+# Y - outcome data
+# Ct_start - posterior samples of cutoff location (categorized with natural numbers)
+# obtained through "cutoff_initial_dis.txt"
+# ubl - minimum value of the left boundary point of the window, ubr - maximum value of the right boundary point the window
+# for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
+# than for the model fitting (ns=25)
+# s - seed 
+Initial_CONT_BIN<-function(X,T,Y,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
+  set.seed(s)
+  pr=0.5
+  MIN=min(X)
+  MAX=max(X)
+  c=sample(C_start,1)
+  tl=mean(T[X<c])
+  tr=mean(T[X>=c])
+  yl=mean(Y[X<c])
+  yr=mean(Y[X>=c])
+  
+  kl=runif(1,ubl,c-lb)
+  kr=runif(1,c+lb,ubr)
+  krd=kr-c
+  kld=kl-c
+  a0l=runif(1,0.9*yl,min(1,1.1*yl))
+  a1l=runif(1,(yl-a0l)/kld,(0.9*yl-a0l)/kld)
+  b0l=logit(a0l)
+  b1l=a1l*1/(invlogit(b0l)*(1-invlogit(b0l)))
+  a2l=rnorm(1,0,pr)
+  a3l=0
+  a0r=runif(1,0.9*yr,min(1,1.1*yr))
+  b0r=logit(a0r)
+  a1r=runif(1,(0.9*yr-a0r)/krd,(yr-a0r)/(kr-c))
+  b1r=a1r*1/(invlogit(b0r)*(1-invlogit(b0r)))
+  a2r=rnorm(1,0,pr)
+  a3r=0
+  
+  
+  j=ifelse(tr-tl>=abs(a0r-a0l),max(jlb,tr-tl),max(jlb,abs(a0r-a0l)))
+  k1t=runif(1,lb,c-ubl)
+  k2t=runif(1,lb,ubr-c)
+  a2lt=0
+  b2lt=tl
+  a1lt=0
+  b1lt=(c-k1t)*(a2lt-a1lt)+b2lt
+  a1rt=0
+  b1rt=a1lt*c+b1lt+j-a1rt*c
+  a2rt=0
+  b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
+  return(list(c=c,j=j,a0l=a0l,a1l=a1l,a2l=a2l,a3l=a3l,a0r=a0r,a1r=a1r,a2r=a2r,a3r=a3r,kl=kl,kr=kr,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
 }

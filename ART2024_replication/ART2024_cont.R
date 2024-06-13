@@ -1,5 +1,5 @@
 ## Replication code for "Bayesian Regression Discontinuity Design with Unknown Cutoff" ##
-## ART Application - main code ##
+## ART Application - additional code ##
 ## Julia Kowalska, Mark van de Wiel, Stéphanie van der Pas ##
 
 ## To run the following code it is necessary to first install JAGS. The instructions
@@ -38,11 +38,9 @@ T=dd$art_6m
 T=ifelse(T==1,0,1)
 
 ## Main code ##
-## The following code was used to obtain the results presented in the paper.
-#  Depending on the computer computation time can take significantly longer than 
-#  the time indicated in the brackets. In the file ART2024_cont.R we provide additional
-#  code with continuous, instead of discrete, prior on the cutoff that yields similar
-#  results to the code below with less computation time required. ##
+## The following code yields similar results to the code in ART2024_main.R that was used
+# to obtain results in the paper, but it requires less computation time. Instead of
+# a discrete prior on c, a continous prior is used. ## 
 # Scatter plot of the treatment data
 binsize=5
 c=NULL
@@ -80,39 +78,39 @@ T=ifelse(T==1,0,1)
   ubrt=b_hivt$ubr
   ublt=b_hivt$ubl}
 
-# Prior on c - uniform between 300 and 399
-start=299
-prob=rep(1,100) 
+# Prior on c - continous uniform between 300 and 400 (on th normalized dataset between 0.3 and 0.4)
+clb=300/nc
+cub=400/nc
 # Lower bound on the jump size in the treatment probability function
 jlb=0.2
 
-# Fitting two constant functions to initialize values of c (approx 50 seconds)
-datHIV_T=list(N=length(X),x=X,t=T,jlb=0.2,prob=prob,start=start,nc=nc,lb=lb)
-initcART=list(ct=50,al=0.5,j=0.3,.RNG.seed=1,.RNG.name="base::Mersenne-Twister")
-param_c=c('ct')
-datHIV_c<- run.jags('cutoff_initial_DIS.txt',inits = list(initcART) ,data=datHIV_T,monitor=param_c,burnin = 1000,sample=2000,adapt = 100,n.chains = 1,method = 'simple')
-Ct_start=as.numeric(combine.mcmc(datHIV_c))
+# Fitting two constant functions to initialize values of c (approx 7 seconds)
+datHIV_T=list(N=length(X),x=X,t=T,jlb=0.2,clb=clb,cub=cub,lb=lb)
+initcART=list(c=350/nc,al=0.5,j=0.3,.RNG.seed=1,.RNG.name="base::Mersenne-Twister")
+param_c=c('c')
+system.time(datHIV_c<- run.jags('cutoff_initial_CONT.txt',inits = list(initcART) ,data=datHIV_T,monitor=param_c,burnin = 1000,sample=2000,adapt = 100,n.chains = 1,method = 'simple'))
+C_start=as.numeric(combine.mcmc(datHIV_c))
 
-# Fitting treatment model (approx 35 minutes)
-init1=Initial_DIS_treatment(X,T,Ct_start,lb,ubr,ubl,start,prob,100,nc)
-init2=Initial_DIS_treatment(X,T,Ct_start,lb,ubr,ubl,start,prob,200,nc)
-init3=Initial_DIS_treatment(X,T,Ct_start,lb,ubr,ubl,start,prob,300,nc)
-init4=Initial_DIS_treatment(X,T,Ct_start,lb,ubr,ubl,start,prob,400,nc)
+# Fitting treatment model (approx 9 minutes)
+init1=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,100)
+init2=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,200)
+init3=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,300)
+init4=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,400)
 param_cj=c('c','j')
-datHIV_T=list(N=length(X),x=X,t=T,jlb=jlb,prob=prob,start=start,nc=nc,lb=lb,ubrt=ubrt,ublt=ublt)
-system.time(HIV_FULL_treatment<- run.jags('treatment_DIS.txt', data=datHIV_T,monitor=param_cj,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
+datHIV_T=list(N=length(X),x=X,t=T,jlb=jlb,clb=clb,cub=cub,lb=lb,ubrt=ubrt,ublt=ublt)
+system.time(HIV_FULL_treatment<- run.jags('treatment_CONT.txt', data=datHIV_T,monitor=param_cj,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
 
 # Convergence check
 plot(HIV_FULL_treatment,c('trace'))
 
 # Fitting full LoTTA model (approx 13.5 hours)
-init1=Initial_BIN_DIS(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,100,nc)
-init2=Initial_BIN_DIS(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,200,nc)
-init3=Initial_BIN_DIS(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,300,nc)
-init4=Initial_BIN_DIS(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,400,nc)
-datHivfull=list(N=length(X),x=X,t=T,y=Y,ubr=b_hiv$ubr,ubl=b_hiv$ubl,ubrt=ubrt,ublt=ublt,lb=b_hiv$lb,prob=prob,start=start,nc=nc,jlb=jlb)
+init1=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,100)
+init2=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,200)
+init3=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,300)
+init4=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,400)
+datHivfull=list(N=length(X),x=X,t=T,y=Y,ubr=b_hiv$ubr,ubl=b_hiv$ubl,ubrt=ubrt,ublt=ublt,lb=b_hiv$lb,clb=clb,cub=cub,nc=nc,jlb=jlb)
 param_full=c('c','j','kl','kr','eff','a0l','a1l','a2l','a3l','a0r','a1r','a2r','a3r','b1lt','a1lt','a2lt','b2lt','b1rt','a1rt','a2rt','b2rt','k1t','k2t')
-system.time(HIV_FULL<- run.jags('LoTTA_DIS_BIN', data=datHivfull,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
+system.time(HIV_FULL<- run.jags('LoTTA_BIN', data=datHivfull,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
 # Convergence check
 plot(HIV_FULL,c('trace'),c('eff','c','j'))
 gelman.diag(HIV_FULL)
@@ -121,12 +119,14 @@ Samples_FULL=combine.mcmc(HIV_FULL)
 Samples_FULL_treatment=combine.mcmc(HIV_FULL_treatment)
 # -- Cutoff location --
 C_Full=as.numeric(Samples_FULL[,1])*nc
+C_Full_DIS=ceiling(C_Full) # discritized cutoff posterior
 C_Treatment=as.numeric(Samples_FULL_treatment[,1])*nc
+C_Treatment_DIS=ceiling(C_Treatment) # discritized cutoff posterior
 
-c_Full=data.frame(C=C_Full)  
+c_Full=data.frame(C=C_Full_DIS)  
 c_Full$Model<-'Full'
 
-c_Treatment=data.frame(C=C_Treatment)
+c_Treatment=data.frame(C=C_Treatment_DIS)
 c_Treatment$Model<-'Treatment'
 
 count.df <- rbind(c_Treatment,c_Full)
@@ -162,8 +162,8 @@ T=ddtr$art_6m
 T=ifelse(T==1,0,1)
 
 {b_hiv=bounds(X,25)
-  prob=rep(1,100)
-  start=300
+  clb=300
+  cub=400
   ubr=b_hiv$ubr
   ubl=b_hiv$ubl
   lb=b_hiv$lb
@@ -172,21 +172,21 @@ T=ifelse(T==1,0,1)
   ublt=b_hivt$ubl}
 
 
-datHIV_T=list(N=length(X),x=X,t=T,jlb=jlb,prob=prob,start=start,nc=nc,lb=lb)
-initcART=list(ct=50,al=0.5,j=0.3,.RNG.seed=1,.RNG.name="base::Mersenne-Twister")
-param_c=c('ct')
-datHIV_cTr<- run.jags('cutoff_initial_DIS.txt',inits = list(initcART) ,data=datHIV_T,monitor=param_c,burnin = 1000,sample=2000,adapt = 100,n.chains = 1,method = 'simple')
-Ct_startTr=as.numeric(combine.mcmc(datHIV_cTr))
+datHIV_T=list(N=length(X),x=X,t=T,jlb=jlb,clb=clb,cub=cub,lb=lb)
+initcART=list(ct=0.35,al=0.5,j=0.3,.RNG.seed=1,.RNG.name="base::Mersenne-Twister")
+param_c=c('c')
+datHIV_cTr<- run.jags('cutoff_initial_CONT.txt',inits = list(initcART) ,data=datHIV_T,monitor=param_c,burnin = 1000,sample=2000,adapt = 100,n.chains = 1,method = 'simple')
+C_startTr=as.numeric(combine.mcmc(datHIV_cTr))
 
 # Fitting full LoTTA model (approx 5.5 hours)
-init1=Initial_DIS_BIN(X,T,Y,Ct_startTr,lb,ubr,ubl,start,prob,100,nc)
-init2=Initial_DIS_BIN(X,T,Y,Ct_startTr,lb,ubr,ubl,start,prob,200,nc)
-init3=Initial_DIS_BIN(X,T,Y,Ct_startTr,lb,ubr,ubl,start,prob,300,nc)
-init4=Initial_DIS_BIN(X,T,Y,Ct_startTr,lb,ubr,ubl,start,prob,400,nc)
+init1=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,100)
+init2=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,200)
+init3=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,300)
+init4=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,400)
 
-datHivTr=list(N=length(X),x=X,t=T,y=Y,ubr=b_hiv$ubr,ubl=b_hiv$ubl,ubrt=ubrt,ublt=ublt,lb=b_hiv$lb,prob=prob,start=start,nc=nc,jlb=jlb)
+datHivTr=list(N=length(X),x=X,t=T,y=Y,ubr=b_hiv$ubr,ubl=b_hiv$ubl,ubrt=ubrt,ublt=ublt,lb=b_hiv$lb,clb=clb,cub=cub,nc=nc,jlb=jlb)
 param_full=c('c','j','kl','kr','eff','a0l','a1l','a2l','a3l','a0r','a1r','a2r','a3r','b1lt','a1lt','a2lt','b2lt','b1rt','a1rt','a2rt','b2rt','k1t','k2t')
-system.time(HIV_TRIM<- run.jags('LoTTA_DIS_BIN', data=datHivTr,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
+system.time(HIV_TRIM<- run.jags('LoTTA_CONT_BIN', data=datHivTr,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
 
 # Convergence check
 plot(HIV_TRIM,c('trace'),c('eff','c','j'))
@@ -195,12 +195,13 @@ gelman.diag(HIV_TRIM)
 Samples_TRIM=combine.mcmc(HIV_TRIM)
 # -- Cutoff location --
 C_Full=as.numeric(Samples_FULL[,1])*nc
+C_Full_DIS=ceiling(C_Full)
 C_Trimmed=as.numeric(Samples_TRIM[,1])*nc
-
-c_Full=data.frame(C=C_Full)  
+C_Trimmed_DIS=ceiling(C_Trimmed)
+c_Full=data.frame(C=C_Full_DIS)  
 c_Full$Dataset<-'Full'
 
-c_Trimmed=data.frame(C=C_Trimmed)
+c_Trimmed=data.frame(C=C_Trimmed_DIS)
 c_Trimmed$Dataset<-'Trimmed'
 
 count.df <- rbind(c_Trimmed,c_Full)
@@ -419,7 +420,7 @@ paste("TRIMMED DATASET: LLR estimate of the compliance rate at c=350 with 95% co
 
 # Cutoff
 
-c_map_full=as.numeric(attributes(which.max(table(C_Full)/length(C_Full))))
-c_map_trimmed=as.numeric(attributes(which.max(table(C_Trimmed)/length(C_Trimmed))))
+c_map_full=map_estimate(C_Full)
+c_map_trimmed=map_estimate(C_Trimmed)
 paste("FULL DATASET: MAP estimate of the cutoff:", round(c_map_full,2))
 paste("TRIMMED DATASET: MAP estimate of the cutoff:", round(c_map_trimmed,2))
