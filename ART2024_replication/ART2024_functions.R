@@ -73,7 +73,7 @@ cat("model
     
     
     }", file="treatment_DIS.txt") 
-# LoTTA model for a binary score
+# LoTTA model for a discrete score and binary outcomes
 #--This model fits jointly treatment and outcome functions.--# 
 # t - treatment data, y - outcome data, c - cutoff, j - jump size at the cutoff
 # prob - vector of length n of prior weights on the discrete location of c,
@@ -178,7 +178,7 @@ bounds<-function(X,ns=25){
 # than for the model fitting (ns=25)
 # s - seed 
 
-Initial_DIS_treatment<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
+Initial_treatment_DIS<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
   set.seed(s)
   pr=0.5
   MIN=min(X)
@@ -203,7 +203,7 @@ Initial_DIS_treatment<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2)
   return(list(ct=ct,j=j,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
 }
 
-# LoTTA model
+# LoTTA model for a discrete score and binary outcomes
 # X - score 
 # T - treatment data
 # Y - outcome data
@@ -423,8 +423,7 @@ cat("model
 # t - treatment data, y - outcome data, c - cutoff, j - jump size at the cutoff
 # clb - lower bound of the interval in the prior of c ~ unif(clb,cub),
 # cub - upper bound of the interval in the prior of c ~ unif(clb,cub),
-# start, nc - shifting and rescaling coefficient to translate prior on ct to the domain of c--#
-# lb - grid size
+# lb - minimum window size
 # eff - treatment effect for compliers
 
 # In the treatment model:
@@ -491,17 +490,18 @@ cat("model
     }", file="LoTTA_CONT_BIN.txt")
 
 # Functions to sample an initial value of a chain
-# Treatment model - continous score
+# Treatment model - continuous score
 # X - score 
 # T - treatment data
-# C_start - posterior samples of cutoff location on a continous scale
+# C_start - posterior samples of cutoff location on a continuous scale
 # obtained through "cutoff_initial_CONT.txt"
+# lb - minimum window size
 # ubl - minimum value of the window's left boundary point, ubr - maximum value of the window's right boundary point
 # for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
 # than for the model fitting (ns=25)
 # s - seed 
 
-Initial_CONT_treatment<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
+Initial_treatment_CONT<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
   set.seed(s)
   pr=0.5
   MIN=min(X)
@@ -529,7 +529,7 @@ Initial_CONT_treatment<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
 # X - score 
 # T - treatment data
 # Y - outcome data
-# Ct_start - posterior samples of cutoff location (categorized with natural numbers)
+# C_start - posterior samples of cutoff location on a continuous scale
 # obtained through "cutoff_initial_dis.txt"
 # ubl - minimum value of the left boundary point of the window, ubr - maximum value of the right boundary point the window
 # for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)

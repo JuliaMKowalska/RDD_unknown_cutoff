@@ -78,7 +78,7 @@ T=ifelse(T==1,0,1)
   ubrt=b_hivt$ubr
   ublt=b_hivt$ubl}
 
-# Prior on c - continous uniform between 300 and 400 (on th normalized dataset between 0.3 and 0.4)
+# Prior on c - continuous uniform between 300 and 400 (on the normalized dataset between 0.3 and 0.4)
 clb=300/nc
 cub=400/nc
 # Lower bound on the jump size in the treatment probability function
@@ -92,10 +92,10 @@ system.time(datHIV_c<- run.jags('cutoff_initial_CONT.txt',inits = list(initcART)
 C_start=as.numeric(combine.mcmc(datHIV_c))
 
 # Fitting treatment model (approx 9 minutes)
-init1=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,100)
-init2=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,200)
-init3=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,300)
-init4=Initial_CONT_treatment(X,T,C_start,lb,ubr,ubl,start,prob,400)
+init1=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,100)
+init2=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,200)
+init3=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,300)
+init4=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,400)
 param_cj=c('c','j')
 datHIV_T=list(N=length(X),x=X,t=T,jlb=jlb,clb=clb,cub=cub,lb=lb,ubrt=ubrt,ublt=ublt)
 system.time(HIV_FULL_treatment<- run.jags('treatment_CONT.txt', data=datHIV_T,monitor=param_cj,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
