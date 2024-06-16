@@ -222,13 +222,13 @@ system.time(postA_1to500<-lapply(2001:2500, simulation_SHARP,"A"))
 system.time(postA_501to1000<-lapply(2501:3000, simulation_SHARP,"A"))
 
   # Results
-Results1<-lapply(postA_1to500, performance_sample_SHARP,"A","LoTTA")
-Results2<-lapply(postA_501to1000, performance_sample_SHARP,"A","LoTTA")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  Results1<-lapply(postA_1to500, performance_sample_SHARP,"A","LoTTA")
+  Results2<-lapply(postA_501to1000, performance_sample_SHARP,"A","LoTTA")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
 
 
 # LLR
@@ -243,13 +243,13 @@ system.time(postB_1to500<-lapply(1:500, simulation_SHARP,"B"))
 system.time(postB_501to1000<-lapply(501:1000, simulation_SHARP,"B"))
 
 # Results
-Results1<-lapply(postB_1to500, performance_sample_SHARP,"B","LoTTA")
-Results2<-lapply(postB_501to1000, performance_sample_SHARP,"B","LoTTA")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  Results1<-lapply(postB_1to500, performance_sample_SHARP,"B","LoTTA")
+  Results2<-lapply(postB_501to1000, performance_sample_SHARP,"B","LoTTA")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
 
 
 # LLR
@@ -264,13 +264,13 @@ system.time(postC_1to500<-lapply(1001:1500, simulation_SHARP,"C"))
 system.time(postC_501to1000<-lapply(1501:2000, simulation_SHARP,"C"))
 
 # Results
-Results1<-lapply(postC_1to500, performance_sample_SHARP,"C","LoTTA")
-Results2<-lapply(postC_501to1000, performance_sample_SHARP,"C","LoTTA")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  Results1<-lapply(postC_1to500, performance_sample_SHARP,"C","LoTTA")
+  Results2<-lapply(postC_501to1000, performance_sample_SHARP,"C","LoTTA")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
 
 
 # LLR
@@ -288,13 +288,13 @@ system.time(postlee_1to500<-lapply(1:500, simulation_SHARP,"lee"))
 system.time(postlee_501to1000<-lapply(501:1000, simulation_SHARP,"lee"))
 
 # Results
-Results1<-lapply(postlee_1to500, performance_sample_SHARP,"lee","LoTTA")
-Results2<-lapply(postlee_501to1000, performance_sample_SHARP,"lee","LoTTA")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  Results1<-lapply(postlee_1to500, performance_sample_SHARP,"lee","LoTTA")
+  Results2<-lapply(postlee_501to1000, performance_sample_SHARP,"lee","LoTTA")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
 
 
 # Cubic polynomial
@@ -302,14 +302,14 @@ system.time(postlee_1to500<-lapply(1:500, simulation_cubic_SHARP,"lee"))
 system.time(postlee_501to1000<-lapply(501:1000, simulation_cubic_SHARP,"lee"))
 
 # Results
-Results1<-lapply(postlee_1to500, performance_sample_SHARP,"lee","3poly")
-Results2<-lapply(postlee_501to1000, performance_sample_SHARP,"lee","3poly")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
-
+  Results1<-lapply(postlee_1to500, performance_sample_SHARP,"lee","3poly")
+  Results2<-lapply(postlee_501to1000, performance_sample_SHARP,"lee","3poly")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
 
 # LLR
 LLR_res=LLR_performance_SHARP(1000,'lee')
@@ -323,26 +323,26 @@ sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. (MAP estimate)
 system.time(postludwig_1to500<-lapply(1:500, simulation_SHARP,"ludwig"))
 system.time(postludwig_501to1000<-lapply(501:1000, simulation_SHARP,"ludwig"))
   # Results
-Results1<-lapply(postludwig_1to500, performance_sample_SHARP,"ludwig","LoTTA")
-Results2<-lapply(postludwig_501to1000, performance_sample_SHARP,"ludwig","LoTTA")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2))
+  Results1<-lapply(postludwig_1to500, performance_sample_SHARP,"ludwig","LoTTA")
+  Results2<-lapply(postludwig_501to1000, performance_sample_SHARP,"ludwig","LoTTA")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2))
 
 # Cubic polynomial 
 system.time(postludwig_1to500<-lapply(1:500, simulation_cubic_SHARP,"ludwig"))
 system.time(postludwig_501to1000<-lapply(501:1000, simulation_cubic_SHARP,"ludwig"))
   # Results 
-Results1<-lapply(postludwig_1to500, performance_sample_SHARP,"ludwig","3poly")
-Results2<-lapply(postludwig_501to1000, performance_sample_SHARP,"ludwig","3poly")
-Results1=do.call(rbind.data.frame, Results1)
-Results2=do.call(rbind.data.frame, Results2)
-Results=rbind(Results1,Results2) 
-apply(Results, 2,mean)
-sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
-
+  Results1<-lapply(postludwig_1to500, performance_sample_SHARP,"ludwig","3poly")
+  Results2<-lapply(postludwig_501to1000, performance_sample_SHARP,"ludwig","3poly")
+  Results1=do.call(rbind.data.frame, Results1)
+  Results2=do.call(rbind.data.frame, Results2)
+  Results=rbind(Results1,Results2) 
+  apply(Results, 2,mean)
+  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
 
 # LLR
 LLR_res=LLR_performance_SHARP(1000,'ludwig')
@@ -420,5 +420,4 @@ lineF.df=data.frame(X=x,Y=Fun)
 
 
 ggarrange(pllee,plludwig,ncol=2)
-
 

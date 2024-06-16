@@ -168,7 +168,7 @@ bounds<-function(X,ns=25){
   return(list(ubl=ubl,ubr=ubr,lb=lb))
 }
 # Function to sample an initial value of a chain
-# Treatment model
+# Treatment model disecrete score
 # X - score 
 # T - treatment data
 # Ct_start - posterior samples of cutoff location (categorized with natural numbers)
@@ -184,7 +184,7 @@ Initial_treatment_DIS<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2)
   MIN=min(X)
   MAX=max(X)
   ct=sample(Ct_start,1)
-  c=ct*lb+start/nc-lb
+  c=(ct+start)/nc
   tl=mean(T[X<c])
   tr=mean(T[X>=c])
   
@@ -208,7 +208,7 @@ Initial_treatment_DIS<-function(X,T,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2)
 # T - treatment data
 # Y - outcome data
 # Ct_start - posterior samples of cutoff location (categorized with natural numbers)
-# obtained through "cutoff_initial_dis.txt"
+# obtained through "cutoff_initial_DIS.txt"
 # ubl - minimum value of the left boundary point of the window, ubr - maximum value of the right boundary point the window
 # for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
 # than for the model fitting (ns=25)
@@ -219,7 +219,7 @@ Initial_DIS_BIN<-function(X,T,Y,Ct_start,lb,ubr,ubl,start,prob,s,nc,jlb=0.2){
   MIN=min(X)
   MAX=max(X)
   ct=sample(Ct_start,1)
-  c=ct*lb+start/nc-lb
+  c=(ct+start)/nc
   tl=mean(T[X<c])
   tr=mean(T[X>=c])
   yl=mean(Y[X<c])
@@ -525,7 +525,7 @@ Initial_treatment_CONT<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
   return(list(c=c,j=j,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
 }
 
-# LoTTA model
+# LoTTA model 
 # X - score 
 # T - treatment data
 # Y - outcome data

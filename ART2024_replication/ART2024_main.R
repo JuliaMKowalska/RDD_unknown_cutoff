@@ -51,7 +51,7 @@ T_plot=Bin_data(T,X,c,binsize)[[1]]
 plot.df=data.frame('X'=X_plot,'Y'=T_plot)
 
 ggscatter(plot.df, x = "X", y = "Y",color = "gray", size = 3, alpha = 0.6)+labs( y="Proportion T=1", x="CD4 Count",title = 'Prob. of delayed ART initiation') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 13),legend.position = 'bottom')
+  theme_classic(base_size = 14)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
 
 # Scatter plot of the outcome data
 binsize=5
@@ -134,7 +134,7 @@ plot <- ggplot(count.df, aes(C,fill=Model))
 plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'dodge',binwidth = 0.5) +xlim(350,361)+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("c "), "- cutoff" )),title = 'Posterior of the cutoff location') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
 
 # -- Compliance rate --
 J_Full=as.numeric(Samples_FULL[,2])
@@ -148,10 +148,10 @@ j_Treatment$Model<-'Treatment'
 
 count.df <- rbind(j_Treatment,j_Full)
 plot <- ggplot(count.df, aes(J,fill=Model))
-plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'identity') +xlim(min(append(J_Full,J_Treatment)),max(append(J_Full,J_Treatment)))+ 
+plot + geom_histogram(aes(y=..density..),position = 'identity') +xlim(min(append(J_Full,J_Treatment)),max(append(J_Full,J_Treatment)))+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("j "), "- compliance rate" )),title = 'Posterior of the compliance rate') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
 
 
 # -- TRIMMED DATASET --
@@ -208,7 +208,7 @@ plot <- ggplot(count.df, aes(C,fill=Dataset))
 plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'dodge',binwidth = 0.5) +xlim(350,361)+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("c "), "- cutoff" )),title = 'Posterior of the cutoff location') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
 
 # -- Compliance rate --
 J_Full=as.numeric(Samples_FULL[,2])
@@ -222,10 +222,10 @@ j_Trimmed$Dataset<-'Trimmed'
 
 count.df <- rbind(j_Trimmed,j_Full)
 plot <- ggplot(count.df, aes(J,fill=Dataset))
-plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'identity') +xlim(min(append(J_Full,J_Trimmed)),max(append(J_Full,J_Trimmed)))+ 
+plot + geom_histogram(aes(y=..density..),position = 'identity') +xlim(min(append(J_Full,J_Trimmed)),max(append(J_Full,J_Trimmed)))+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("j "), "- compliance rate" )),title = 'Posterior of the compliance rate') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
 
 # -- Treatment effect --
 Eff_Full=as.numeric(Samples_FULL[,5])
@@ -239,10 +239,10 @@ eff_Trimmed$Dataset<-'Trimmed'
 
 count.df <- rbind(eff_Trimmed,eff_Full)
 plot <- ggplot(count.df, aes(Eff,fill=Dataset))
-plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'identity') +xlim(min(append(Eff_Full,Eff_Trimmed)),max(append(Eff_Full,Eff_Trimmed)))+ 
+plot + geom_histogram(aes(y=..density..),position = 'identity') +xlim(min(append(Eff_Full,Eff_Trimmed)),max(append(Eff_Full,Eff_Trimmed)))+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("eff "), "- treatment effect" )),title = 'Posterior of the treatment effect') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
 # -- Posterior functions --
 # Focus region - treatment probablity
 lb_p=200
@@ -271,7 +271,7 @@ lineT.df=data.frame(X=x,Y=q_funT[2,],lower95=q_funT[1,],upper95=q_funT[3,])
 
 ggscatter(plot.df, x = "X", y = "Y",
           color = "gray",
-          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Trimmed'),data=lineT.df,alpha=0.2)+geom_point(aes(x=X,y=Y),data=lineT.df,size=0.1)+labs( y="", x=expression(paste(italic('X')," - score")),title="Treatment probability function",subtitle = 'Prob. of delayed ART initiation')+theme_classic(base_size = 13)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
+          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Trimmed'),data=lineT.df,alpha=0.2)+geom_point(aes(x=X,y=Y),data=lineT.df,size=0.1)+labs( y="", x=expression(paste(italic('X')," - score")),title="Treatment probability function",subtitle = 'Prob. of delayed ART initiation')+theme_classic(base_size = 14)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),plot.subtitle = element_text(hjust = 0.5),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
 
 # Focus region - outcome function
 X_plot=Bin_data(Y,X,c,binsize)[[2]]
@@ -289,7 +289,7 @@ lineT.df=data.frame(X=x,Y=q_funT[2,],lower95=q_funT[1,],upper95=q_funT[3,])
 
 ggscatter(plot.df, x = "X", y = "Y",
           color = "gray",
-          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Trimmed'),data=lineT.df,alpha=0.2)+geom_point(aes(x=X,y=Y),data=lineT.df,size=0.1)+labs( y="", x=expression(paste(italic('X')," - score")),title = 'Outcome function',subtitle = 'Prob. of retention in care')+theme_classic(base_size = 13)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
+          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Trimmed'),data=lineT.df,alpha=0.2)+geom_point(aes(x=X,y=Y),data=lineT.df,size=0.1)+labs( y="", x=expression(paste(italic('X')," - score")),title = 'Outcome function',subtitle = 'Prob. of retention in care')+theme_classic(base_size = 14)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),plot.subtitle = element_text(hjust = 0.5),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
 
 
 # Full dataset - treatment probablity
@@ -319,7 +319,7 @@ lineT.df=data.frame(X=x,Y=q_funT[2,],lower95=q_funT[1,],upper95=q_funT[3,])
 
 ggscatter(plot.df, x = "X", y = "Y",
           color = "gray",
-          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+labs( y="", x=expression(paste(italic('X')," - score")),title="Treatment probability function",subtitle = 'Prob. of delayed ART initiation')+theme_classic(base_size = 13)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
+          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+labs( y="", x=expression(paste(italic('X')," - score")),title="Treatment probability function",subtitle = 'Prob. of delayed ART initiation')+theme_classic(base_size = 14)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),plot.subtitle = element_text(hjust = 0.5),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
 
 # Focus region - outcome function
 X_plot=Bin_data(Y,X,c,binsize)[[2]]
@@ -337,7 +337,7 @@ lineT.df=data.frame(X=x,Y=q_funT[2,],lower95=q_funT[1,],upper95=q_funT[3,])
 
 ggscatter(plot.df, x = "X", y = "Y",
           color = "gray",
-          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+labs( y="", x=expression(paste(italic('X')," - score")),title = 'Outcome function',subtitle = 'Prob. of retention in care')+theme_classic(base_size = 13)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
+          size = 3, alpha = 0.6)+geom_vline(xintercept = 355,linetype='dotted',color="#009E73")+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+geom_ribbon(aes(x=X,y=Y,ymin = lower95, ymax = upper95,fill='Full'),data=lineF.df,alpha=0.35)+geom_point(aes(x=X,y=Y),data=lineF.df,size=0.1,col='#E69F00')+labs( y="", x=expression(paste(italic('X')," - score")),title = 'Outcome function',subtitle = 'Prob. of retention in care')+theme_classic(base_size = 14)+theme(text = element_text(family='serif'),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),plot.subtitle = element_text(hjust = 0.5),legend.position = 'bottom')+ scale_fill_manual(name="Model fit",values=c('Full'='#E69F00','Trimmed'='black'),labels = c(expression(paste("Full dataset ", italic(X) %in%"[50,950]"  )), expression(paste("Trimmed dataset ", italic(X) %in%"[200,500]"  )))) 
 
 # LLR approach
 # Full dataset c=355

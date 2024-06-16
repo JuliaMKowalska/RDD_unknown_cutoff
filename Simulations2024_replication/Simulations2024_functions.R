@@ -754,3 +754,5 @@ bounds<-function(X,ns=25){
   return(list(ubl=ubl,ubr=ubr,lb=lb))
 }
 
+
+
