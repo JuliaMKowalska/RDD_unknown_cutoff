@@ -131,10 +131,10 @@ c_Treatment$Model<-'Treatment'
 
 count.df <- rbind(c_Treatment,c_Full)
 plot <- ggplot(count.df, aes(C,fill=Model))
-plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'dodge',binwidth = 0.5) +xlim(350,361)+ 
+(pl1=plot + geom_histogram(aes(y=2*after_stat(count)/sum(after_stat(count))),position = 'dodge',binwidth = 0.5) +xlim(350,361)+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("c "), "- cutoff" )),title = 'Posterior of the cutoff location') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom'))
 
 # -- Compliance rate --
 J_Full=as.numeric(Samples_FULL[,2])
@@ -148,12 +148,12 @@ j_Treatment$Model<-'Treatment'
 
 count.df <- rbind(j_Treatment,j_Full)
 plot <- ggplot(count.df, aes(J,fill=Model))
-plot + geom_histogram(aes(y=..density..),position = 'identity') +xlim(min(append(J_Full,J_Treatment)),max(append(J_Full,J_Treatment)))+ 
+(pl2=plot + geom_histogram(aes(y=..density..),position = 'identity') +xlim(min(append(J_Full,J_Treatment)),max(append(J_Full,J_Treatment)))+ 
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("j "), "- compliance rate" )),title = 'Posterior of the compliance rate') +
-  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
+  theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom'))
 
-
+ggarrange(pl1,pl2,common.legend = TRUE,legend = 'bottom')
 # -- TRIMMED DATASET --
 ddtr=subset(dd,dd$cd4>=200 & dd$cd4<=500)
 X=ddtr$cd4/nc

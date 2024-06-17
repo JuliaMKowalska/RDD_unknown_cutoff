@@ -501,7 +501,7 @@ cat("model
 # than for the model fitting (ns=25)
 # s - seed 
 
-Initial_treatment_CONT<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
+Initial_treatment_CONT<-function(X,T,C_start,lb,ubr,ubl,s,jlb=0.2){
   set.seed(s)
   pr=0.5
   MIN=min(X)
@@ -535,7 +535,7 @@ Initial_treatment_CONT<-function(X,T,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
 # for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
 # than for the model fitting (ns=25)
 # s - seed 
-Initial_CONT_BIN<-function(X,T,Y,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
+Initial_CONT_BIN<-function(X,T,Y,C_start,lb,ubr,ubl,s,jlb=0.2){
   set.seed(s)
   pr=0.5
   MIN=min(X)
@@ -577,3 +577,4 @@ Initial_CONT_BIN<-function(X,T,Y,C_start,lb,ubr,ubl,start,prob,s,jlb=0.2){
   b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
   return(list(c=c,j=j,a0l=a0l,a1l=a1l,a2l=a2l,a3l=a3l,a0r=a0r,a1r=a1r,a2r=a2r,a3r=a3r,kl=kl,kr=kr,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
 }
+

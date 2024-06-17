@@ -92,10 +92,10 @@ system.time(datHIV_c<- run.jags('cutoff_initial_CONT.txt',inits = list(initcART)
 C_start=as.numeric(combine.mcmc(datHIV_c))
 
 # Fitting treatment model (approx 9 minutes)
-init1=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,100)
-init2=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,200)
-init3=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,300)
-init4=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,start,prob,400)
+init1=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,100)
+init2=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,200)
+init3=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,300)
+init4=Initial_treatment_CONT(X,T,C_start,lb,ubr,ubl,400)
 param_cj=c('c','j')
 datHIV_T=list(N=length(X),x=X,t=T,jlb=jlb,clb=clb,cub=cub,lb=lb,ubrt=ubrt,ublt=ublt)
 system.time(HIV_FULL_treatment<- run.jags('treatment_CONT.txt', data=datHIV_T,monitor=param_cj,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
@@ -104,13 +104,13 @@ system.time(HIV_FULL_treatment<- run.jags('treatment_CONT.txt', data=datHIV_T,mo
 plot(HIV_FULL_treatment,c('trace'))
 
 # Fitting full LoTTA model 
-init1=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,100)
-init2=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,200)
-init3=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,300)
-init4=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,start,prob,400)
+init1=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,100)
+init2=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,200)
+init3=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,300)
+init4=Initial_CONT_BIN(X,T,Y,C_start,lb,ubr,ubl,400)
 datHivfull=list(N=length(X),x=X,t=T,y=Y,ubr=b_hiv$ubr,ubl=b_hiv$ubl,ubrt=ubrt,ublt=ublt,lb=b_hiv$lb,clb=clb,cub=cub,nc=nc,jlb=jlb)
 param_full=c('c','j','kl','kr','eff','a0l','a1l','a2l','a3l','a0r','a1r','a2r','a3r','b1lt','a1lt','a2lt','b2lt','b1rt','a1rt','a2rt','b2rt','k1t','k2t')
-system.time(HIV_FULL<- run.jags('LoTTA_BIN', data=datHivfull,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
+system.time(HIV_FULL<- run.jags('LoTTA_CONT_BIN', data=datHivfull,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 40000,sample=25000,adapt = 1000, method='parallel',n.chains = 4))
 # Convergence check
 plot(HIV_FULL,c('trace'),c('eff','c','j'))
 gelman.diag(HIV_FULL)
@@ -162,8 +162,8 @@ T=ddtr$art_6m
 T=ifelse(T==1,0,1)
 
 {b_hiv=bounds(X,25)
-  clb=300
-  cub=400
+  clb=300/nc
+  cub=400/nc
   ubr=b_hiv$ubr
   ubl=b_hiv$ubl
   lb=b_hiv$lb
@@ -179,10 +179,10 @@ datHIV_cTr<- run.jags('cutoff_initial_CONT.txt',inits = list(initcART) ,data=dat
 C_startTr=as.numeric(combine.mcmc(datHIV_cTr))
 
 # Fitting full LoTTA model (approx 1.5 hours)
-init1=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,100)
-init2=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,200)
-init3=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,300)
-init4=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,start,prob,400)
+init1=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,100)
+init2=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,200)
+init3=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,300)
+init4=Initial_CONT_BIN(X,T,Y,C_startTr,lb,ubr,ubl,400)
 
 datHivTr=list(N=length(X),x=X,t=T,y=Y,ubr=b_hiv$ubr,ubl=b_hiv$ubl,ubrt=ubrt,ublt=ublt,lb=b_hiv$lb,clb=clb,cub=cub,nc=nc,jlb=jlb)
 param_full=c('c','j','kl','kr','eff','a0l','a1l','a2l','a3l','a0r','a1r','a2r','a3r','b1lt','a1lt','a2lt','b2lt','b1rt','a1rt','a2rt','b2rt','k1t','k2t')
