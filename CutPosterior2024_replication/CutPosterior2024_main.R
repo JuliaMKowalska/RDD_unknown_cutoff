@@ -176,7 +176,7 @@ init3=Initial_CONT_CONT(X,T,Y,C_start,lb,ubrs,ubls,jlb,300)
 init4=Initial_CONT_CONT(X,T,Y,C_start,lb,ubrs,ubls,jlb,400)
 dat1=list(N=length(X),x=X,t=T,y=Y,ubr=ubr,ubl=ubl,ubrt=ubrt,ublt=ublt,lb=lb,nc=nc,jlb=jlb,clb=clb,cub=cub)
 param_full=c('c','j','kl','kr','eff','a0l','a1l','a2l','a3l','a0r','a1r','a2r','a3r','b1lt','a1lt','a2lt','b2lt','b1rt','a1rt','a2rt','b2rt','k1t','k2t')
-system.time(datjoint<- run.jags('LoTTA_CONT_CONT', data=dat1,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 30000,sample=2500,adapt = 500, method='parallel',n.chains = 4))
+system.time(datjoint<- run.jags('LoTTA_CONT_CONT', data=dat1,monitor=param_full,inits =list(init1,init2,init3,init4),burnin = 30000,sample=250,adapt = 500, method='parallel',n.chains = 4))
 
 # Sample from cut posterior
 Samples=combine.mcmc(dattreatment)
