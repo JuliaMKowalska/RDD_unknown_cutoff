@@ -754,5 +754,11 @@ bounds<-function(X,ns=25){
   return(list(ubl=ubl,ubr=ubr,lb=lb))
 }
 
-
+# Logit and inverse logit functions
+logit<-function(x){
+  return(log(x/(1-x)))
+}
+invlogit<-function(x){
+  return(1/(1+exp(-x)))
+}
 
