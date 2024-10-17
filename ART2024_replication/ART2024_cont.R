@@ -30,6 +30,7 @@ source('ART2024_functions.R')
 ## The data was made available by Matias D. Cattaneo and can be downloaded under the link:
 # https://github.com/rdpackages-replication/CKT_2023_SIM/blob/master/CKT_2023_SIM--ART.dta ##
 
+#download.file("https://github.com/rdpackages-replication/CKT_2023_SIM/blob/master/CKT_2023_SIM--ART.dta",destfile = "CKT_2023_SIM--ART.dta")
 data <- read.dta("CKT_2023_SIM--ART.dta")
 dd = data[complete.cases(data[,c("visit_test_6_18", "art_6m", "cd4")]),]
 X=dd$cd4

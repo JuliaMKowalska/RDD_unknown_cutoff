@@ -30,7 +30,8 @@ source('Chemo2024_functions.R')
 ## The data was made available by Matias D. Cattaneo and can be downloaded under the link:
 # https://github.com/rdpackages-replication/CKT_2023_SIM/blob/master/CKT_2023_Chemo.dta ##
 
-data <- read.dta("/Users/julia/Downloads/CKT_2023_Chemo.dta", warn.missing.labels = FALSE)
+#download.file("https://github.com/rdpackages-replication/CKT_2023_SIM/blob/master/CKT_2023_Chemo.dta",destfile = "CKT_2023_Chemo.dta")
+data <- read.dta("CKT_2023_Chemo.dta", warn.missing.labels = FALSE)
 X=data$onc_score
 T=data$chemo
 Y=data$cancer2

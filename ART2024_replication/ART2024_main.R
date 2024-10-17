@@ -30,6 +30,7 @@ source('ART2024_functions.R')
 ## The data was made available by Matias D. Cattaneo and can be downloaded under the link:
 # https://github.com/rdpackages-replication/CKT_2023_SIM/blob/master/CKT_2023_SIM--ART.dta ##
 
+#download.file("https://github.com/rdpackages-replication/CKT_2023_SIM/blob/master/CKT_2023_SIM--ART.dta",destfile = "CKT_2023_SIM--ART.dta")
 data <- read.dta("CKT_2023_SIM--ART.dta")
 dd = data[complete.cases(data[,c("visit_test_6_18", "art_6m", "cd4")]),]
 X=dd$cd4
@@ -243,6 +244,18 @@ plot + geom_histogram(aes(y=..density..),position = 'identity') +xlim(min(append
   scale_fill_manual(values=c(alpha("#E69F00",0.6), alpha("black",0.5))) +labs(
     y="Density", x=expression(paste(italic("eff "), "- treatment effect" )),title = 'Posterior of the treatment effect') +
   theme_classic(base_size = 12)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 14),plot.title = element_text(hjust = 0.5),legend.position = 'bottom')
+
+# -- Cutoff influence on the treatment effect --
+dat=data.frame(c=as.numeric(Samples_FULL[,'c']),eff=as.numeric(Samples_FULL[,'eff']))
+pl1=ggplot(data = dat, mapping = aes(x = c))+xlim(349,365)+
+  geom_boxplot(data=dat,aes(y = eff, group=c))+labs( y="Treatment effect", title="Cutoff location vs. Treatment effect",x="",fill='posterior prob. of c') +
+  theme_classic(base_size = 13)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 13),plot.title = element_text(hjust = 0.5),legend.position = 'bottom',axis.ticks.x = element_blank()) 
+
+pl2=ggplot(data = dat, mapping = aes(x = c)) +xlim(349,365)+
+  geom_density()+labs( y="Density of cutoff location", x="CD4 Count") +
+  theme_classic(base_size = 13)+theme(text = element_text(family='serif'),axis.text=element_text(family = "sans"),legend.text =element_text(size = 13),legend.position = 'bottom')
+ggarrange(pl1,pl2,nrow = 2,align = 'hv')
+
 # -- Posterior functions --
 # Focus region - treatment probablity
 lb_p=200
