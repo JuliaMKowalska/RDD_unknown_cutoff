@@ -240,6 +240,7 @@ performance_sample_FUZZY<-function(post_sample,name,jump){
   prob=probs[[jump]]
   effects=list("A"=0.17,"B"=-0.2, "C"=0, "lee"=0.04, "ludwig"=-3.45)
   compliance=list("0.55"=0.55,"0.3"=0.30)
+  j=compliance[[jump]]
   tr_eff=effects[[name]]/compliance[[jump]]
   
   Samples=combine.mcmc(post_sample)
