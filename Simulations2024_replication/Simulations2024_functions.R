@@ -375,7 +375,7 @@ performance_sample_SHARP<-function(post_sample,name,model){
   qcieff_len=as.numeric(qeff[2]-qeff[1])
   hdicieff_len=as.numeric(hdieff[2]-hdieff[1])
   
-  return(list(abs_err_med=merreff,abs_err_map=maperreff,ci_length_sym=qcieff_len,ci_length_hdi=hdicieff_len,bias_med=tr_eff-meff,bias_map=tr_eff-mapeff,cov_med=coveff,cov_hdi=hdicoveff,sign_med=signeff,sign_hdi=hdisigneff))
+  return(list(abs_err_med=merreff,abs_err_map=maperreff,ci_length_sym=qcieff_len,ci_length_hdi=hdicieff_len,bias_med=-tr_eff+meff,bias_map=-tr_eff+mapeff,cov_med=coveff,cov_hdi=hdicoveff,sign_med=signeff,sign_hdi=hdisigneff))
   
   
 }
@@ -409,7 +409,7 @@ LLR_performance_SHARP<-function(N,name,st=0){
       signeff=ifelse(0<qeff[1],1,0)
     }
     qcieff_len=as.numeric(qeff[2]-qeff[1])
-    l=list(abs_err=merreff,ci_length=qcieff_len,bias=tr_eff-meff,cov=coveff,sign=signeff)
+    l=list(abs_err=merreff,ci_length=qcieff_len,bias=-(tr_eff-meff),cov=coveff,sign=signeff)
     rddat[i,]=l
   }
   return(rddat)
@@ -489,7 +489,7 @@ cat("model
     a2rt~dunif(0,(1-b1rt-(c+k2t)*a1rt)/(MAX-c-k2t))
     b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
     
-    tau1l~dchisqr(7)
+    tau1l~dgamma(0.01,0.01)
     tau2pl~dbeta(1,1)
     tau2l=-tau2pl*tau1l
     klt~dbeta(1,1)
@@ -499,7 +499,7 @@ cat("model
     a2l~dnorm(0,pr*(c-kl))
     a3l~dnorm(0,pr*(c-kl))
     
-    tau1r~dchisqr(7)
+    tau1r~dgamma(0.01,0.01)
     tau2pr~dbeta(1,1)
     tau2r=-tau2pr*tau1r
     krt~dbeta(1,1)
@@ -542,7 +542,7 @@ cat("model
     ### Define the priors
     c=0
     xc=x-c
-    tau1l~dchisqr(7)
+    tau1l~dgamma(0.01,0.01)
     tau2pl~dbeta(1,1)
     tau2l=-tau2pl*tau1l
     klt~dbeta(1,1)
@@ -552,7 +552,7 @@ cat("model
     a2l~dnorm(0,pr*(c-kl))
     a3l~dnorm(0,pr*(c-kl))
     
-    tau1r~dchisqr(7)
+    tau1r~dgamma(0.01,0.01)
     tau2pr~dbeta(1,1)
     tau2r=-tau2pr*tau1r
     krt~dbeta(1,1)
@@ -598,13 +598,13 @@ cat("model
     a1l~dnorm(0,pr)
     a2l~dnorm(0,pr)
     a3l~dnorm(0,pr)
-    tau1l~dchisqr(7)
+    tau1l~dgamma(0.01,0.01)
     
     a0r~dnorm(0,pr)
     a1r~dnorm(0,pr)
     a2r~dnorm(0,pr)
     a3r~dnorm(0,pr)
-    tau1r~dchisqr(7)
+    tau1r~dgamma(0.01,0.01)
     
     eff=(a0r-a0l)
     
