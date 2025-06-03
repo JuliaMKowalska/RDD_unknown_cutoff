@@ -304,7 +304,7 @@ simulation_SHARP<-function(i,name){
   init3=Initial_SHARP_CONT(X,Y,0,lb,ubrs,ubls,3)
   init4=Initial_SHARP_CONT(X,Y,0,lb,ubrs,ubls,4)
   dat2=list(N=length(X),x=X,y=Y,ubr=ubr,ubl=ubl,lb=lb,nc=nc,seed=i)
-  dat12_post<- run.jags('LoTTA_SHARP_CONT.txt', data=dat2,inits = list(init1,init2,init3,init4),monitor=param_full_out,burnin = 30000,sample=25000,adapt = 500,n.chains = 4,method = 'parallel')
+  dat12_post<- run.jags('LoTTA_SHARP_CONT.txt', data=dat2,inits = list(init1,init2,init3,init4),monitor=param_full_out,burnin = 10000,sample=25000,adapt = 1000,n.chains = 4,method = 'parallel')
 }
 
 ## Single simulation - sharp design cubic polynomial model
@@ -332,7 +332,7 @@ simulation_cubic_SHARP<-function(i,name){
   init3=Initial_3poly_SHARP(X,Y,0,3)
   init4=Initial_3poly_SHARP(X,Y,0,4)
   dat2=list(N=length(X),x=X,y=Y,ubr=ubr,ubl=ubl,lb=lb,nc=nc,seed=i)
-  dat12_post<- run.jags('3poly_SHARP.txt', data=dat2,inits = list(init1,init2,init3,init4),monitor=param_full_out,burnin = 30000,sample=25000,adapt = 500,n.chains = 4,method = 'parallel')
+  dat12_post<- run.jags('3poly_SHARP.txt', data=dat2,inits = list(init1,init2,init3,init4),monitor=param_full_out,burnin = 10000,sample=25000,adapt = 5000,n.chains = 4,method = 'parallel')
 }
 ## Results from a single posterior sample - sharp design 
 # post_sample - posterior sample from LoTTA_SHARP_CONT ot 3poly_SHARP,
