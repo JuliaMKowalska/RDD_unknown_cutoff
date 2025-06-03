@@ -147,7 +147,7 @@ cat("model
     a2rt~dunif(0,(1-b1rt-(c+k2t)*a1rt)/(MAX-c-k2t))
     b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
     
-    tau1l~dchisqr(7)
+    tau1l~dgamma(0.01,0.01)
     tau2pl~dbeta(1,1)
     tau2l=-tau2pl*tau1l
     klt~dbeta(1,1)
@@ -157,7 +157,7 @@ cat("model
     a2l~dnorm(0,pr*(c-kl))
     a3l~dnorm(0,pr*(c-kl))
     
-    tau1r~dchisqr(7)
+    tau1r~dgamma(0.01,0.01)
     tau2pr~dbeta(1,1)
     tau2r=-tau2pr*tau1r
     krt~dbeta(1,1)
@@ -200,7 +200,7 @@ cat("model
     ### Define the priors
    
     xc=x-c
-    tau1l~dchisqr(7)
+    tau1l~dgamma(0.01,0.01)
     tau2pl~dbeta(1,1)
     tau2l=-tau2pl*tau1l
     klt~dbeta(1,1)
@@ -210,7 +210,7 @@ cat("model
     a2l~dnorm(0,pr*(c-kl))
     a3l~dnorm(0,pr*(c-kl))
     
-    tau1r~dchisqr(7)
+    tau1r~dgamma(0.01,0.01)
     tau2pr~dbeta(1,1)
     tau2r=-tau2pr*tau1r
     krt~dbeta(1,1)
