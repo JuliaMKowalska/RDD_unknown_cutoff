@@ -279,6 +279,31 @@ performance_sample_FUZZY<-function(post_sample,name,jump){
   mcabs=abs(c-mces)
   return(list(abs_err_med=merreff,abs_err_map=maperreff,ci_length_sym=qcieff_len,ci_length_hdi=hdicieff_len,bias_med=-(tr_eff-meff),bias_map=-(tr_eff-mapeff),cov_med=coveff,cov_hdi=hdicoveff,sign_med=signeff,sign_hdi=hdisigneff,c_abs_med=mcabs,c_abs_map=cabs,j_abs_med=mjabs,j_abs_map=jabs))
 }
+
+## Results from a single posterior sample of a cutoff location - fuzzy design 
+# post_sample - posterior sample from LoTTA_CONT_CONT,
+# Returns a list with the following parameters for each simulation:
+# absolute error of MAP estimate of c, 
+# length of 95% HDI,
+# bias of MAP estimate,
+# binary indicator if HDI contains c
+# absolute error of MAP estimate of cutoff, 
+
+performance_cutoff_sample_FUZZY<-function(post_sample){
+  c=0
+
+  Samples=combine.mcmc(post_sample)
+  C=as.numeric(Samples[,1])
+  mapc=as.numeric(map_estimate(C))
+  hdic=as.numeric(ci(C,method='HDI'))[2:3]
+  covc=ifelse(c<=hdic[2]&c>=hdic[1],1,0)
+  lenc=hdic[2]-hdic[1]
+  mcabs=abs(c-mapc)
+  
+
+  return(list(abs_err_map=mcabs,ci_length_hdi=lenc,bias_map=mapc,cov_hdi=covc))
+}
+
 ## Single simulation - sharp design LoTTA model
 # i - seed,
 # name - function name: "A", "B", "C", "lee", "ludwig" #
