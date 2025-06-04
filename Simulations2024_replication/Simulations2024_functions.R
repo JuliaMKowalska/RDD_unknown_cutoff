@@ -176,7 +176,7 @@ simulation_FUZZY<-function(i,name,jump){
   init3=Initial_CONT_CONT(X,T,Y,C_start,lb,ubrs,ubls,jlb,3)
   init4=Initial_CONT_CONT(X,T,Y,C_start,lb,ubrs,ubls,jlb,4)
   dat=list(N=length(X),x=X,t=T,y=Y,ubr=ubr,ubl=ubl,ubrt=ubrt,ublt=ublt,lb=lb,nc=nc,jlb=0.2,clb=-0.8,cub=0.2,seed=i)
-  posterior<- run.jags('LoTTA_CONT_CONT.txt', data=dat,inits = list(init1,init2,init3,init4),monitor=param_full,burnin = 30000,sample=25000,adapt = 500,n.chains = 4,method = 'parallel')
+  posterior<- run.jags('LoTTA_CONT_CONT.txt', data=dat,inits = list(init1,init2,init3,init4),monitor=param_full,burnin = 10000,sample=25000,adapt = 1000,n.chains = 4,method = 'parallel')
 }
 ## LLR simulations results - sharp design 
 # N - number of samples,
@@ -215,7 +215,7 @@ LLR_performance_FUZZY<-function(N,name,jump,st=0){
     qcieff_len=as.numeric(qeff[2]-qeff[1])
     j=r$tau_T[2]
     out=meff*j
-    biases=tr_eff-meff
+    biases=-(tr_eff-meff)
     l=list(abs_err=merreff,ci_length=qcieff_len,bias=biases,cov=coveff,sign=signeff,j_abs_err=abs(compliance[[jump]]-j))
     rddat[i,]=l
   }
@@ -277,7 +277,7 @@ performance_sample_FUZZY<-function(post_sample,name,jump){
   mjabs=abs(j-mjes)
   mces=as.numeric(median(C))
   mcabs=abs(c-mces)
-  return(list(abs_err_med=merreff,abs_err_map=maperreff,ci_length_sym=qcieff_len,ci_length_hdi=hdicieff_len,bias_med=(tr_eff-meff),bias_map=(tr_eff-mapeff),cov_med=coveff,cov_hdi=hdicoveff,sign_med=signeff,sign_hdi=hdisigneff,c_abs_med=mcabs,c_abs_map=cabs,j_abs_med=mjabs,j_abs_map=jabs))
+  return(list(abs_err_med=merreff,abs_err_map=maperreff,ci_length_sym=qcieff_len,ci_length_hdi=hdicieff_len,bias_med=-(tr_eff-meff),bias_map=-(tr_eff-mapeff),cov_med=coveff,cov_hdi=hdicoveff,sign_med=signeff,sign_hdi=hdisigneff,c_abs_med=mcabs,c_abs_map=cabs,j_abs_med=mjabs,j_abs_map=jabs))
 }
 ## Single simulation - sharp design LoTTA model
 # i - seed,
