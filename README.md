@@ -5,7 +5,7 @@ Kowalska, van de Wiel, van der Pas (2024)
 
 Files: 
 - ART2024_replication : data application in Section 4 and Appendix B.4,
-- Simulations2024_replication: simulation study in Section 5 and Appendix B.1,
+- Simulations2024_replication: simulation study in Section 5 and Appendix B.1 and B.2,
 - Chemotherapy2024_replication: data aplication in Appendix B.2,
 - Cutposterior2024_replication: simulations in Appendix C
 
