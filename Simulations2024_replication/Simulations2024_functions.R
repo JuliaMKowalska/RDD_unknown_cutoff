@@ -498,6 +498,44 @@ LLR_performance_SHARP<-function(N,name,st=0){
   }
   return(rddat)
 }
+
+## Performance of a plug-in estimator 
+# i - index,
+# res - output of performance_cutoff_sample_FUZZY 
+# name - function name: "A", "B", "C", 
+# jump - string, jumpsize: "0.55" or "0.3"; indicates treatment probablity function,
+# Returns list with the following entries:
+# abs_err: absolute error of plug-in estimate of of tr.eff, ci_length: 95% confidence interval length of the plug-in estimate,
+# bias: bias, cov: binary indicator of the true value bein in the confidence interval
+
+plugin_estimator<-function(i,res,name,jump){
+  
+  functions=list("A"=funA_sample,"B"=funB_sample, "C"=funC_sample)
+  seed_start=list("A"=2000,"B"=0, "C"=1000)
+  probs=list("0.55"=sample_prob55,"0.3"=sample_prob30)
+  fun=functions[[name]]
+  prob=probs[[jump]]
+  effects=list("A"=0.17,"B"=-0.2, "C"=0, "lee"=0.04, "ludwig"=-3.45)
+  compliance=list("0.55"=0.55,"0.3"=0.30)
+  j=compliance[[jump]]
+  tr_eff=effects[[name]]/compliance[[jump]]
+  
+  set.seed(seed_start[[name]]+i)
+  X=sort(2*rbeta(500,2,4)-1)
+  Y=fun(X)
+  T=prob(X)
+  
+  c_est=res[[i,3]]
+  r=rdrobust(Y,X,c_est,fuzzy=T)
+  
+  meff=r$Estimate[[2]]
+  qcieff_len= r$ci[3,2]-r$ci[3,1]
+  coveff=ifelse(tr_eff<=r$ci[3,2]&tr_eff>=r$ci[3,1],1,0)
+  
+  
+  return(list(abs_err=abs(meff-tr_eff),ci_length=qcieff_len,bias=-(tr_eff-meff),cov=coveff))
+}
+
 ## Bayesian models ##
 
 # Model for the initial cutoff localization for a continuous score
