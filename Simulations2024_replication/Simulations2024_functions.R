@@ -404,6 +404,65 @@ performance_sample_SHARP<-function(post_sample,name,model){
   
   
 }
+
+## Single simulation - treatment-only 
+# i - seed,
+# jump - string, jumpsize: "0.55" or "0.3", indicates treatment probablity function
+simulation_treatment<-function(i,jump){                      
+  functions=list("A"=funA_sample,"B"=funB_sample, "C"=funC_sample, "lee"=lee_sample, "ludwig"=ludwig_sample)
+  probs=list("0.55"=sample_prob55,"0.3"=sample_prob30)
+  fun=functions[['A']]
+  prob=probs[[jump]]
+  print(i)
+  set.seed(i)
+  X=sort(2*rbeta(500,2,4)-1)
+  Y=fun(X)
+  T=prob(X)
+  (b_f1=bounds(X,25))
+  b_f1t=bounds(X,25)
+  ubr=b_f1$ubr
+  ubl=b_f1$ubl
+  ubrt=b_f1t$ubr
+  ublt=b_f1t$ubl
+  lb=b_f1$lb
+  (b_s=bounds(X,50))
+  ubrs=b_s$ubr
+  ubls=b_s$ubl
+  jlb=0.2
+  nc=1
+  dat1T=list(N=length(X),x=X,t=T,jlb=0.2,clb=-0.8,cub=0.2)
+  param_full=c('c','j')
+  param_c=c('c')
+  initc1=list(c=-0.3,al=0.5,j=0.3,.RNG.seed=1,.RNG.name="base::Mersenne-Twister")
+  dat1_c<- run.jags('cutoff_initial_CONT.txt',inits = list(initc1) ,data=dat1T,monitor=param_c,burnin = 900,sample=2000,adapt = 100,n.chains = 1,method = 'simple')
+  C_start=as.numeric(combine.mcmc(dat1_c$mcmc))
+  init1=Initial_treatment_CONT(X,T,C_start,lb,ubrs,ubls,1,jlb)
+  init2=Initial_treatment_CONT(X,T,C_start,lb,ubrs,ubls,2,jlb)
+  init3=Initial_treatment_CONT(X,T,C_start,lb,ubrs,ubls,3,jlb)
+  init4=Initial_treatment_CONT(X,T,C_start,lb,ubrs,ubls,4,jlb)
+  dat=list(N=length(X),x=X,t=T,ubrt=ubrt,ublt=ublt,lb=lb,jlb=0.2,clb=-0.8,cub=0.2,seed=i)
+  posterior<- run.jags('treatment_CONT.txt', data=dat,inits = list(init1,init2,init3,init4),monitor=param_full,burnin = 10000,sample=25000,adapt = 1000,n.chains = 4,method = 'parallel')
+}
+
+## Single simulation - treatment-only simple function
+# i - seed,
+# jump - string, jumpsize: "0.55" or "0.3", indicates treatment probablity function
+simulation_treatment_simple<-function(i,jump){                      
+  functions=list("A"=funA_sample,"B"=funB_sample, "C"=funC_sample, "lee"=lee_sample, "ludwig"=ludwig_sample)
+  probs=list("0.55"=sample_prob55,"0.3"=sample_prob30)
+  fun=functions[['A']]
+  prob=probs[[jump]]
+  print(i)
+  set.seed(i)
+  X=sort(2*rbeta(500,2,4)-1)
+  Y=fun(X)
+  T=prob(X)
+  jlb=0.2
+  dat1T=list(N=length(X),x=X,t=T,jlb=0.2,clb=-0.8,cub=0.2)
+  param_c=c('c')
+  posterior<- run.jags('cutoff_initial_CONT.txt',data=dat1T,monitor=param_c,burnin = 10000,sample=25000,adapt = 1000,n.chains = 4,method = 'parallel')
+}
+
 ## LLR simulations results - sharp design 
 # N - number of samples,
 # name - function name: "A", "B", "C", "lee", "ludwig", 
@@ -756,6 +815,43 @@ Initial_3poly_SHARP<-function(X,Y,c,s){
   
   return(list(a0l=a0l,a1l=a1l,a2l=a2l,a3l=a3l,a0r=a0r,a1r=a1r,a2r=a2r,a3r=a3r,tau1r=tau1r,tau1l=tau1l,.RNG.seed=s)) 
 }
+
+# Functions to sample an initial value of a chain in the treatment-only model
+# Treatment model - continuous score
+# X - score 
+# T - treatment data
+# C_start - posterior samples of cutoff location on a continuous scale
+# obtained through "cutoff_initial_CONT.txt"
+# lb - minimum window size
+# ubl - minimum value of the window's left boundary point, ubr - maximum value of the window's right boundary point
+# for setting initial value we recommend using ubl, ubr obtained from bounds with higher ns (ns=50)
+# than for the model fitting (ns=25)
+# s - seed 
+
+Initial_treatment_CONT<-function(X,T,C_start,lb,ubr,ubl,s,jlb=0.2){
+  set.seed(s)
+  pr=0.5
+  MIN=min(X)
+  MAX=max(X)
+  c=sample(C_start,1)
+  tl=mean(T[X<c])
+  tr=mean(T[X>=c])
+  
+  
+  j=max(jlb,tr-tl)
+  k1t=runif(1,lb,max(c-ubl,lb+0.001))
+  k2t=runif(1,lb,max(ubr-c,lb+0.001))
+  a2lt=0
+  b2lt=tl
+  a1lt=0
+  b1lt=(c-k1t)*(a2lt-a1lt)+b2lt
+  a1rt=0
+  b1rt=a1lt*c+b1lt+j-a1rt*c
+  a2rt=0
+  b2rt=(c+k2t)*(a1rt-a2rt)+b1rt
+  return(list(c=c,j=j,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
+}
+
 ## Additional functions ##
 
 # Function to compute minimum and maximum window size 
