@@ -47,7 +47,7 @@ source('Simulations2024_functions.R')
 #----------------------------#
 
 ## Fuzzy design ##
-# A single simulation takes around 4 minutes. In the following code we split simulations
+# A single simulation takes around 2.2 minutes. In the following code we split simulations
 # into two batches of 500.
 
 # Function A #
@@ -213,7 +213,7 @@ sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
 sqrt(mean(LLR_res[['j_abs']]^2)) # RMSE compliance rate 
 
 ## Sharp design ##
-# A single simulation takes around 71 seconds. In the following code we split simulations
+# A single simulation takes around 45 seconds. In the following code we split simulations
 # into two batches of 500.
 
 
