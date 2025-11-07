@@ -1,5 +1,5 @@
 ## Replication code for "Bayesian Regression Discontinuity Design with Unknown Cutoff" ##
-## Simulations - main script ##
+## Simulations - main script & supplementary materials ##
 ## Julia Kowalska, Mark van de Wiel, Stéphanie van der Pas ##
 
 ## To run the following code it is necessary to first install JAGS. The instructions
@@ -708,6 +708,13 @@ ggarrange(pllee,plludwig,ncol=2)
   Results_plugin=do.call(rbind.data.frame, Results_plugin)
   apply(Results_plugin, 2,mean)
   sqrt(mean(Results_plugin[['abs_err']]^2))
+
+
+#----------------------------#
+#  Appendix E.1              #
+#----------------------------#
+
+
 
 
 
