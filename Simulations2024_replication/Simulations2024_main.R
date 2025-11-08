@@ -714,61 +714,481 @@ ggarrange(pllee,plludwig,ncol=2)
 #  Appendix E.1              #
 #----------------------------#
 
+      #----------------------------#
+      #      Fuzzy design          #
+      #----------------------------#
+
 # Function A #
 
 # jump = 0.55
 
-# Results
-  Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C",3)
-  Results2<-lapply(seq(501,1000), performance_sample_SHARP_LLR,postC_501to1000,"C",3)
-  Results1=do.call(rbind.data.frame, Results1)
-  Results2=do.call(rbind.data.frame, Results2)
-  Results=rbind(Results1,Results2) 
-  apply(Results, 2,mean)
-  apply(Results[,1:6], 2,median)
-  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
-  sqrt(mean(Results[['c_abs_map']]^2)) # RMSE cutoff location (MAP estimate)
-  sqrt(mean(Results[['j_abs_map']]^2)) # RMSE compliance rate (MAP estimate)
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postA_1to500,"A","0.55",1)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postA_501to1000,"A","0.55",1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_FUZZY(1000,'A','0.55',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
 
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postA_1to500,"A","0.55",2)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postA_501to1000,"A","0.55",2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_FUZZY(1000,'A','0.55',2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
 
-
-
-# LLR
-LLR_res=LLR_performance_FUZZY(1000,'A','0.55',2000)
-apply(LLR_res, 2,mean)
-apply(LLR_res[1:3], 2,median)
-sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
-sqrt(mean(LLR_res[['j_abs']]^2)) # RMSE compliance rate 
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postA_1to500,"A","0.55",3)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postA_501to1000,"A","0.55",3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_FUZZY(1000,'A','0.55',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+    
 
  
 # jump = 0.3
 
-system.time(postA_1to500<-lapply(2001:2500, simulation_FUZZY,"A","0.3"))
-system.time(postA_501to1000<-lapply(2501:3000, simulation_FUZZY,"A","0.3"))
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postA_1to500,"A","0.3",1)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postA_501to1000,"A","0.3",1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_FUZZY(1000,'A','0.3',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
 
-# Results
-  Results1<-lapply(postA_1to500, performance_sample_FUZZY,"A","0.3")
-  Results2<-lapply(postA_501to1000, performance_sample_FUZZY,"A","0.3")
-  Results1=do.call(rbind.data.frame, Results1)
-  Results2=do.call(rbind.data.frame, Results2)
-  Results=rbind(Results1,Results2) 
-  apply(Results, 2,mean)
-  apply(Results[,1:6], 2,median)
-  sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
-  sqrt(mean(Results[['c_abs_map']]^2)) # RMSE cutoff location (MAP estimate)
-  sqrt(mean(Results[['j_abs_map']]^2)) # RMSE compliance rate (MAP estimate)
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postA_1to500,"A","0.3",2)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postA_501to1000,"A","0.3",2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_FUZZY(1000,'A','0.3',2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postA_1to500,"A","0.3",3)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postA_501to1000,"A","0.3",3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_FUZZY(1000,'A','0.3',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Function B #
+
+# jump = 0.55
+
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postB_1to500,"B","0.55",1)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postB_501to1000,"B","0.55",1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_FUZZY(1000,'B','0.55',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
+
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postB_1to500,"B","0.55",2)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postB_501to1000,"B","0.55",2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_FUZZY(1000,'B','0.55',2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postB_1to500,"B","0.55",3)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postB_501to1000,"B","0.55",3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_FUZZY(1000,'B','0.55',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+    
+
+ 
+# jump = 0.3
+
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postB_1to500,"B","0.3",1)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postB_501to1000,"B","0.3",1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_FUZZY(1000,'B','0.3',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
+
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postB_1to500,"B","0.3",2)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postB_501to1000,"B","0.3",2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_FUZZY(1000,'B','0.3',2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postB_1to500,"B","0.3",3)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postB_501to1000,"B","0.3",3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_FUZZY(1000,'B','0.3',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Function C #
+
+# jump = 0.55
+
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C","0.55",1)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postC_501to1000,"C","0.55",1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_FUZZY(1000,'C','0.55',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
+
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C","0.55",2)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postC_501to1000,"C","0.55",2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_FUZZY(1000,'C','0.55',2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C","0.55",3)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postC_501to1000,"C","0.55",3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_FUZZY(1000,'C','0.55',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+    
+
+ 
+# jump = 0.3
+
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C","0.3",1)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postC_501to1000,"C","0.3",1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_FUZZY(1000,'C','0.3',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
+
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C","0.3",2)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postC_501to1000,"C","0.3",2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_FUZZY(1000,'C','0.3',2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_FUZZY_extrapolation,postC_1to500,"C","0.3",3)
+    Results2<-lapply(seq(501,1000), performance_sample_FUZZY_extrapolation,postC_501to1000,"C","0.3",3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_FUZZY(1000,'C','0.3',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
 
 
-# LLR
-LLR_res=LLR_performance_FUZZY(1000,'A','0.3',2000)
-apply(LLR_res, 2,mean)
-apply(LLR_res[1:3], 2,median)
-sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
-sqrt(mean(LLR_res[['j_abs']]^2)) # RMSE compliance rate 
+      #----------------------------#
+      #      Sharp design          #
+      #----------------------------#
 
+# Function A #
 
+# jump = 0.55
 
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postA_1to500,"A" ,1)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postA_501to1000,"A" ,1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_SHARP(1000,' A',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
 
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postA_1to500,"A", 2)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postA_501to1000,"A", 2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_SHARP(1000,'A','2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
 
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postA_1to500,"A", 3)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postA_501to1000,"A", 3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_SHARP(1000,'A',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+# Function B #
 
+# jump = 0.55
 
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postB_1to500,"B" ,1)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postB_501to1000,"B" ,1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_SHARP(1000,'B',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
+
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postB_1to500,"B", 2)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postB_501to1000,"B", 2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_SHARP(1000,'B','2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postB_1to500,"B", 3)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postB_501to1000,"B", 3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_SHARP(1000,'B',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Function C #
+
+# jump = 0.55
+
+# Results h = 0.05
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postC_1to500,"C" ,1)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postC_501to1000,"C" ,1)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.05
+    LLR_res=LR_performance_SHARP(1000,'C',1)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff. 
+
+  # Results h = 0.1
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postC_1to500,"C", 2)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postC_501to1000,"C", 2)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.1
+    LLR_res=LR_performance_SHARP(1000,'C','2)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+
+# Results h = 0.15
+    Results1<-lapply(seq(1,500), performance_sample_SHARP_extrapolation,postC_1to500,"C", 3)
+    Results2<-lapply(seq(501,1000), performance_sample_SHARP_extrapolation,postC_501to1000,"C", 3)
+    Results1=do.call(rbind.data.frame, Results1)
+    Results2=do.call(rbind.data.frame, Results2)
+    Results=rbind(Results1,Results2) 
+    apply(Results, 2,mean)
+    apply(Results, 2,median)
+    sqrt(mean(Results[['abs_err_map']]^2)) # RMSE tr.eff. (MAP estimate)
+  
+  # LR h = 0.15
+    LLR_res=LR_performance_SHARP(1000,'C',3)
+    apply(LLR_res, 2,mean)
+    apply(LLR_res, 2,median)
+    sqrt(mean(LLR_res[['abs_err']]^2)) # RMSE tr.eff.
+    
+
+ 
