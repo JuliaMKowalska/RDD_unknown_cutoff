@@ -178,7 +178,7 @@ simulation_FUZZY<-function(i,name,jump){
   dat=list(N=length(X),x=X,t=T,y=Y,ubr=ubr,ubl=ubl,ubrt=ubrt,ublt=ublt,lb=lb,nc=nc,jlb=0.2,clb=-0.8,cub=0.2,seed=i)
   posterior<- run.jags('LoTTA_CONT_CONT.txt', data=dat,inits = list(init1,init2,init3,init4),monitor=param_full,burnin = 10000,sample=25000,adapt = 1000,n.chains = 4,method = 'parallel')
 }
-## LLR simulations results - sharp design 
+## LLR simulations results - fuzzy design 
 # N - number of samples,
 # name - function name: "A", "B", "C", "lee", "ludwig", 
 # jump - string, jumpsize: "0.55" or "0.3", indicates treatment probablity function
@@ -223,10 +223,10 @@ LLR_performance_FUZZY<-function(N,name,jump,st=0){
 }
 ## Results from a single posterior sample - fuzzy design 
 # post_sample - posterior sample from LoTTA_CONT_CONT,
-# name - function name: "A", "B", "C", "lee", "ludwig", 
-# model - string, indicates Bayesian model: "LoTTA" or "3poly"  
+# name - function name: "A", "B", "C", "lee", "ludwig"
+# jump - string, jumpsize: "0.55" or "0.3", indicates treatment probablity function
 # Returns data frame with the following parameters for each simulation:
-# absolute error of median and MAP estimate of tr.eff, 95% CrI length of symmetric CrI and HDI,
+# absolute error of median and MAP estimate of tr.eff, length of symmetric 95% CrI and HDI,
 # bias of median and MAP estimate,
 # binary indicators if CI contains tr.eff. value for Sym.CrI and HDI, 
 # binary indicator if CI correctly identifies sign of tr.eff for Sym.CrI and HDI 
@@ -364,7 +364,7 @@ simulation_cubic_SHARP<-function(i,name){
 # name - function name: "A", "B", "C", "lee", "ludwig", 
 # model - string, indicates Bayesian model: "LoTTA" or "3poly"  
 # Returns data frame with the following parameters for each simulation:
-# absolute error of median and MAP estimate of tr.eff, 95% CrI length of symmetric CrI and HDI,
+# absolute error of median and MAP estimate of tr.eff, length of symmetric 95%  CrI and HDI,
 # bias of median and MAP estimate,
 # binary indicators if CI contains tr.eff. value for Sym.CrI and HDI, 
 # binary indicator if CI correctly identifies sign of tr.eff for Sym.CrI and HDI #
@@ -921,4 +921,294 @@ logit<-function(x){
 invlogit<-function(x){
   return(1/(1+exp(-x)))
 }
+
+#----------------------------#
+#  Appendix E                #
+#----------------------------#
+
+# Function to calculate E[Y(Z=1)-Y(Z=0)|X \in x] from a single posterior sample 
+# coef_s - posterior sample from the LoTTA model
+# x - list of points 
+# nc - normalization constant; default value 1
+# c - cutoff value if known, NULL otherwise; default value NULL
+# Returns a single numeric value 
+continous_outcome_extrapolation<-function(coef_s,x,nc=1,c=NULL){
+  x=x/nc
+  if(is.null(c)==TRUE){
+    c=coef_s['c']
+  }
+  
+  a0l=coef_s['a0l']
+  a1l=coef_s['a1l']
+  a2l=coef_s['a2l']
+  a3l=coef_s['a3l']
+  
+  a0r=coef_s['a0r']
+  a1r=coef_s['a1r']
+  a2r=coef_s['a2r']
+  a3r=coef_s['a3r']
+  
+  
+  kl=coef_s['kl']
+  kr=coef_s['kr']
+  xc=x-c
+  f_l=a1l*(xc)+a0l+invlogit(100*(kl-x))*((a3l)*(xc)^3+(a2l)*(xc)^2)
+  f_r= a1r*(xc)+a0r+invlogit(100*(x-kr))*((a3r)*(xc)^3+(a2r)*(xc)^2)
+  return(mean(f_r-f_l))
+}
+
+# Function to calculate E[T(Z=1)-T(Z=0)|X \in x] from a single posterior sample 
+# coef_s - posterior sample from the LoTTA model
+# x - list of points 
+# nc - normalization constant; default value 1
+# Returns a single numeric value 
+treatment_function_extrapolation<-function(coef_s,x,nc=1){
+  x=x/nc
+  c=coef_s['c']
+  
+  a1lt=coef_s['a1lt']
+  a2lt=coef_s['a2lt']
+  
+  a1rt=coef_s['a1rt']
+  a2rt=coef_s['a2rt']
+  
+  b1lt=coef_s['b1lt']
+  b2lt=coef_s['b2lt']
+  
+  b1rt=coef_s['b1rt']
+  b2rt=coef_s['b2rt']
+  
+  k1t=coef_s['k1t']
+  k2t=coef_s['k2t']
+  
+  t_l=ifelse(x>=c-k1t,a1lt*x+b1lt,a2lt*x+b2lt)
+  t_r= ifelse(x<=c+k2t,a1rt*x+b1rt,a2rt*x+b2rt)
+
+  return(mean(t_r-t_l))
+}
+
+## Results from a single posterior sample - fuzzy design with extrapolation
+# i - sample index
+# post - posterior sample from LoTTA_CONT_CONT,
+# name - function name: "A", "B", "C"
+# jump - string, jumpsize: "0.55" or "0.3", indicates treatment probablity function
+# h - indicates the window size: 0.05, 0.1, 0.15
+# Returns data frame with the following parameters for each simulation:
+# absolute error of MAP estimate of tr.eff, length of symmetric 95% HDI,
+# bias of MAP estimate,
+# binary indicators if HDI contains tr.eff. value, 
+# binary indicator if HDI correctly identifies sign of tr.eff 
+
+performance_sample_FUZZY_extrapolation<-function(i,post,name,jump,h){
+  
+  if(i%%50==0){
+    print(i)
+  }
+  effects=list("A"=c(0.168,0.163,0.154),"B"=c(-0.202,-0.21,-0.22), "C"=c(0,0,0))
+  effects_t=list('0.55'=c(0.55,0.551,0.551),'0.3'=c(0.30,0.301,0.301))
+  H=c(0.05,0.1,0.15)
+  seed_start=list("A"=2000,"B"=0, "C"=1000)
+  tr_eff=effects[[name]][h]/effects_t[[jump]][h]
+  k=ifelse(i>=501,i-500,i)
+  post_sample=post[k]
+  Samples=combine.mcmc(post_sample)
+  set.seed(seed_start[[name]]+i)
+  X=sort(2*rbeta(500,2,4)-1)
+  Xh=X[abs(X)<=H[h]]
+  
+  Eff=c()
+  Y_out=c()
+  T_out=c()
+  for(j in 1:nrow(Samples)){
+    
+    T1=treatment_function_extrapolation(Samples[j,],Xh)
+    Y1=continous_outcome_extrapolation(Samples[j,],Xh)
+    Y_out[j]=Y1
+    T_out[j]=T1
+    Eff[j]=Y1/T1
+  }
+  
+  hdieff=as.numeric(ci(Eff,method='HDI'))[2:3]
+  Eff=Eff[Eff<=hdieff[2]&Eff>=hdieff[1]]
+  mapeff=as.numeric(map_estimate(Eff))
+  hdicoveff=ifelse(tr_eff<=hdieff[2]&tr_eff>=hdieff[1],1,0)
+  if(tr_eff<0){
+    hdisigneff=ifelse(0>hdieff[2],1,0)
+  }
+  else{
+    
+    hdisigneff=ifelse(0<hdieff[1],1,0)
+  }
+  
+  maperreff=abs(tr_eff-mapeff)
+  hdicieff_len=as.numeric(hdieff[2]-hdieff[1])
+  
+  return(list(abs_err_map=maperreff,ci_length_hdi=hdicieff_len,bias_map=-tr_eff+mapeff,cov_hdi=hdicoveff,sign_hdi=hdisigneff))
+  
+  }
+
+## Results from a single posterior sample - sharp design with extrapolation
+# i - sample index
+# post - posterior sample from LoTTA_SHARP_CONT 
+# name - function name: "A", "B", "C" 
+# h - indicates the window size: 0.05, 0.1, 0.15
+# Returns data frame with the following parameters for each simulation:
+# absolute error of the MAP estimate of tr.eff, length of the 95% HDI,
+# bias of the MAP estimate,
+# binary indicators if HDI contains tr.eff. value, 
+# binary indicator if HDI correctly identifies sign of tr.eff #
+performance_sample_SHARP_extrapolation<-function(i,post,name,h){
+  
+  if(i%%50==0){
+    print(i)
+  }
+  effects=list("A"=c(0.168,0.163,0.154),"B"=c(-0.202,-0.21,-0.22), "C"=c(0,0,0))
+  H=c(0.05,0.1,0.15)
+  seed_start=list("A"=2000,"B"=0, "C"=1000)
+  tr_eff=effects[[name]][h]
+  k=ifelse(i>=501,i-500,i)
+  post_sample=post[k]
+  Samples=combine.mcmc(post_sample)
+  set.seed(seed_start[[name]]+i)
+  X=sort(2*rbeta(500,2,4)-1)
+  Xh=X[abs(X)<=H[h]]
+  
+  Eff=c()
+  
+  for(j in 1:nrow(Samples)){
+    
+    Y1=continous_outcome_extrapolation(Samples[j,],Xh,c=0)
+    Eff[j]=Y1
+  }
+  
+  hdieff=as.numeric(ci(Eff,method='HDI'))[2:3]
+  Eff=Eff[Eff<=hdieff[2]&Eff>=hdieff[1]]
+  mapeff=as.numeric(map_estimate(Eff))
+  hdicoveff=ifelse(tr_eff<=hdieff[2]&tr_eff>=hdieff[1],1,0)
+  if(tr_eff<0){
+    #signeff=ifelse(0>qeff[2],1,0)
+    hdisigneff=ifelse(0>hdieff[2],1,0)
+  }
+  else{
+    hdisigneff=ifelse(0<hdieff[1],1,0)
+  }
+  
+  maperreff=abs(tr_eff-mapeff)
+  hdicieff_len=as.numeric(hdieff[2]-hdieff[1])
+  
+  return(list(abs_err_map=maperreff,ci_length_hdi=hdicieff_len,bias_map=-tr_eff+mapeff,cov_hdi=hdicoveff,sign_hdi=hdisigneff))
+  }
+
+## LR (local randomization) simulations results - fuzzy design 
+# N - number of samples,
+# name - function name: "A", "B", "C" 
+# jump - string, jumpsize: "0.55" or "0.3", indicates treatment probablity function
+# h - indicates the window size: 0.05, 0.1, 0.15
+# Returns data frame with the following parameters for each simulation:
+# absolute error, 95% CI length, bias,
+# binary indicator if CI contains tr.eff. value, binary indicator if CI correctly identifies sign of tr.eff #
+LR_performance_FUZZY<-function(N,name,jump,h){
+  functions=list("A"=funA_sample,"B"=funB_sample, "C"=funC_sample )
+  probs=list("0.55"=sample_prob55,"0.3"=sample_prob30)
+  fun=functions[[name]]
+  prob=probs[[jump]]
+  effects=list("A"=c(0.168,0.163,0.154),"B"=c(-0.202,-0.21,-0.22), "C"=c(0,0,0))
+  effects_t=list('0.55'=c(0.55,0.551,0.551),'0.3'=c(0.30,0.301,0.301))
+  H=c(0.05,0.1,0.15)
+  seed_start=list("A"=2000,"B"=0, "C"=1000)
+  tr_eff=effects[[name]][h]/effects_t[[jump]][h]
+  
+  rddat=data.frame(abs_err=0,ci_length=0,bias=0,cov=0,sign=0)
+  st=seed_start[[name]]
+  j=1
+  for(i in 1:N){
+    
+    if(i%%100==0){
+      print(i)
+    }
+    set.seed(st+i)
+    X=sort(2*rbeta(500,2,4)-1)
+    Y=fun(X)
+    T=prob(X)
+    tryCatch({
+      r=rdrandinf(Y,X,0,wl=-H[h],wr=H[h],ci=0.05,p=0,fuzzy =c(fuzzy.tr=T, fuzzy.stat="tsls") ,quietly = TRUE)
+      meff=r$obs.stat
+      merreff=abs(tr_eff-meff)
+      qeff=as.numeric(r$ci)
+      
+      coveff=ifelse(tr_eff<=qeff[2]&tr_eff>=qeff[1],1,0)
+      if(tr_eff<0){
+        signeff=ifelse(0>qeff[2],1,0)
+      }
+      else{
+        signeff=ifelse(0<qeff[1],1,0)
+      }
+      qcieff_len=as.numeric(qeff[2]-qeff[1])
+      l=list(abs_err=merreff,ci_length=qcieff_len,bias=-(tr_eff-meff),cov=coveff,sign=signeff)
+      rddat[j,]=l
+      j=j+1
+    },
+    error = function(e) {
+      print(i)
+    })
+    
+  }
+  return(rddat)
+}
+
+## LR (local randomization) simulations results - sharp design 
+# N - number of samples,
+# name - function name: "A", "B", "C"
+# h - indicates the window size: 0.05, 0.1, 0.15
+# Returns data frame with the following parameters for each simulation:
+# absolute error, 95% CI length, bias,
+# binary indicator if CI contains tr.eff. value, binary indicator if CI correctly identifies sign of tr.eff #
+LR_performance_SHARP<-function(N,name,h){
+  functions=list("A"=funA_sample,"B"=funB_sample, "C"=funC_sample )
+  fun=functions[[name]]
+  effects=list("A"=c(0.168,0.163,0.154),"B"=c(-0.202,-0.21,-0.22), "C"=c(0,0,0))
+  H=c(0.05,0.1,0.15)
+  seed_start=list("A"=2000,"B"=0, "C"=1000)
+  tr_eff=effects[[name]][h]
+  
+  rddat=data.frame(abs_err=0,ci_length=0,bias=0,cov=0,sign=0)
+  st=seed_start[[name]]
+  j=1
+  for(i in 1:N){
+    
+    if(i%%100==0){
+      print(i)
+    }
+    set.seed(st+i)
+    X=sort(2*rbeta(500,2,4)-1)
+    Y=fun(X)
+
+    tryCatch({
+      r=rdrandinf(Y,X,0,wl=-H[h],wr=H[h],ci=0.05,p=0,quietly = TRUE)
+      meff=r$obs.stat
+      merreff=abs(tr_eff-meff)
+      qeff=as.numeric(r$ci)
+      
+      coveff=ifelse(tr_eff<=qeff[2]&tr_eff>=qeff[1],1,0)
+      if(tr_eff<0){
+        signeff=ifelse(0>qeff[2],1,0)
+      }
+      else{
+        signeff=ifelse(0<qeff[1],1,0)
+      }
+      qcieff_len=as.numeric(qeff[2]-qeff[1])
+      l=list(abs_err=merreff,ci_length=qcieff_len,bias=-(tr_eff-meff),cov=coveff,sign=signeff)
+      rddat[j,]=l
+      j=j+1
+    },
+    error = function(e) {
+      print(i)
+    })
+    
+  }
+  return(rddat)
+}
+
+
+
 
