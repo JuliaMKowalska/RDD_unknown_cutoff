@@ -578,3 +578,86 @@ Initial_CONT_BIN<-function(X,T,Y,C_start,lb,ubr,ubl,s,jlb=0.2){
   return(list(c=c,j=j,a0l=a0l,a1l=a1l,a2l=a2l,a3l=a3l,a0r=a0r,a1r=a1r,a2r=a2r,a3r=a3r,kl=kl,kr=kr,k1t=k1t,k2t=k2t,a1lt=a1lt,a2lt=a2lt,b2lt=b2lt,a1rt=a1rt,a2rt=a2rt,.RNG.seed=s)) 
 }
 
+# Appendix E2
+
+# Function to calculate Y(Z=1,X=x)-Y(Z=0,X=x) from a single posterior sample, binary LoTTA 
+# coef_s - posterior sample from the LoTTA model
+# x - list of points 
+# nc - normalization constant; default value 1
+# Returns list of numerical values
+binary_outcome_extrapolation<-function(coef_s,x,nc=1){
+  x=x/nc
+  c=coef_s['c']
+  a0l=coef_s['a0l']
+  a1l=coef_s['a1l']
+  a2l=coef_s['a2l']
+  a3l=coef_s['a3l']
+  
+  a0r=coef_s['a0r']
+  a1r=coef_s['a1r']
+  a2r=coef_s['a2r']
+  a3r=coef_s['a3r']
+  
+  b0l=logit(a0l)
+  b1l=a1l*(invlogit(-b0l)*(1-invlogit(-b0l)))^(-1)
+  
+  b0r=logit(a0r)
+  b1r=a1r*(invlogit(-b0r)*(1-invlogit(-b0r)))^(-1)
+  
+  kl=coef_s['kl']
+  kr=coef_s['kr']
+  xc=x-c
+  f_l=a1l*(xc)+a0l+invlogit(100*(kl-x))*(invlogit((a3l)*(xc)^3+(a2l)*(xc)^2+b1l*(xc)+b0l)-a0l-a1l*xc)
+  f_r= a1r*(xc)+a0r+invlogit(100*(x-kr))*(invlogit((a3r)*(xc)^3+(a2r)*(xc)^2+b1r*(xc)+b0r)-a0r-a1r*xc)
+  return(f_r-f_l)
+}
+
+# Function to calculate T(Z=1,X=x)-T(Z=0,X=x) from a single posterior sample 
+# coef_s - posterior sample from the LoTTA model
+# x - list of points 
+# nc - normalization constant; default value 1
+# Returns list of numerical values
+treatment_function_extrapolation<-function(coef_s,x,nc=1){
+  x=x/nc
+  c=coef_s['c']
+  
+  a1lt=coef_s['a1lt']
+  a2lt=coef_s['a2lt']
+  
+  a1rt=coef_s['a1rt']
+  a2rt=coef_s['a2rt']
+  
+  b1lt=coef_s['b1lt']
+  b2lt=coef_s['b2lt']
+  
+  b1rt=coef_s['b1rt']
+  b2rt=coef_s['b2rt']
+  
+  k1t=coef_s['k1t']
+  k2t=coef_s['k2t']
+  
+  t_l=ifelse(x>=c-k1t,a1lt*x+b1lt,a2lt*x+b2lt)
+  t_r= ifelse(x<=c+k2t,a1rt*x+b1rt,a2rt*x+b2rt)
+  return(t_r-t_l)
+}
+
+# Function to calculate the extrapolated treatment effect in the ART 
+# Samples - combined posterior samples from the LoTTA model fitted to ART dataset
+# h - window size
+# data - ART dataset
+# Returns list of the posterior extrapolated treatment effect 
+treatment_effect_window<-function(Samples,h,data){
+  tr_eff=c()
+  X=data$cd4/1000
+  h=h/1000
+  for(i in 1:nrow(Samples)){
+   
+    c=Samples[i,'c']
+    x=X[(X-c)<h&(c-X)<=h]
+    Tef=treatment_function_extrapolation(Samples[i,],x)
+    Yef=binary_outcome_extrapolation(Samples[i,],x)
+    tr_eff[i]=mean(Yef)/mean(Tef)
+  }
+  return(tr_eff)
+}
+
